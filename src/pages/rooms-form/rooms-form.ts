@@ -26,6 +26,10 @@ export default defineComponent({
     },
     methods: {
         async init() {
+            const cntViewerTags = document.getElementById("cntViewerTags")
+            while (cntViewerTags.firstChild) 
+                cntViewerTags.removeChild(cntViewerTags.firstChild);
+
             const route = useRoute();
 
             const roomId = route.params["roomId"].toString();
@@ -39,9 +43,15 @@ export default defineComponent({
 
             await this.assignSockets();
 
-            await this.preparePublisher(usr, selectedRoom);
-            await this.prepareViewer(usr, selectedRoom);
+            await Promise.all([
+                this.preparePublisher(usr, selectedRoom),
+                this.prepareViewer(usr, selectedRoom)
+            ]);
 
+        },
+        async close() {
+            if (this.publisher) try { await this.publisher.stop(); } catch(e) {}
+            if (this.viewer) try { await this.viewer.stop(); } catch(e) {}
         },
         async assignSockets() {
 
@@ -111,41 +121,38 @@ export default defineComponent({
             this.viewer = new View(selectedRoom.Id, () => { return usr.viewerToken });
 
             this.viewer.on("track", (event) => {
-                {
-                    //Get track and transceiver from event
-                    const track = event.track;
-                    const transceiver = event.transceiver;
-                    //Get stream
-                    let stream = event.streams[0];
+                //Get track and transceiver from event
+                const track = event.track;
+                const transceiver = event.transceiver;
+                //Get stream
+                let stream = event.streams[0];
 
-                    //Do not duplicate
-                    if (document.getElementById(stream.id))
-                        return;
-                    //Create new video element
-                    const element = document.createElement(stream.getVideoTracks().length ? "video" : "audio");
-                    //If it is multiaudio
-                    if (stream.getAudioTracks().length > 1)
-                        //New stream
-                        stream = new MediaStream([track]);
-                    //Set same id
-                    element.id = stream.id;
-                    //Set trackId mediaId as data
-                    element.dataset.trackId = track.id;
-                    element.dataset.mid = transceiver.mid;
-                    //Set 
-                    //Set src stream
-                    element.srcObject = stream;
-                    //Set other properties
-                    element.autoplay = true;
-                    element.controls = true;
-                    element.muted = false;
-                    element.addEventListener("click", function () {
-                        element.play();
-                        return false;
-                    });
-                    //Append it
-                    document.getElementById("cntViewerTags").appendChild(element);
-                }
+                //Do not duplicate
+                if (document.getElementById(stream.id))
+                    return;
+                //Create new video element
+                const element = document.createElement(stream.getVideoTracks().length ? "video" : "audio");
+                //If it is multiaudio
+                if (stream.getAudioTracks().length > 1)
+                    //New stream
+                    stream = new MediaStream([track]);
+                //Set same id
+                element.id = stream.id;
+                //Set trackId mediaId as data
+                element.dataset.trackId = track.id;
+                element.dataset.mid = transceiver.mid;
+                //Set src stream
+                element.srcObject = stream;
+                //Set other properties
+                element.autoplay = true;
+                element.controls = true;
+                element.muted = false;
+                element.addEventListener("click", function () {
+                    element.play();
+                    return false;
+                });
+                //Append it
+                document.getElementById("cntViewerTags").appendChild(element);
             });
 
             this.viewer.on("broadcastEvent", (event) => {
@@ -264,5 +271,8 @@ export default defineComponent({
     },
     mounted() {
         this.init();
-    }
+    },
+    unmounted() {
+        this.close();
+    },     
 })
