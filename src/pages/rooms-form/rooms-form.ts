@@ -184,11 +184,10 @@ export default defineComponent({
             });
 
             await this.viewer.connect({
-                pinnedSourceId: selectedRoom.OwnerId,	 // Set here the id of the room creator
+                pinnedSourceId: selectedRoom.OwnerId!=sourceId ? selectedRoom.OwnerId : null,
                 multiplexedAudioTracks: 3,
                 excludedSourceIds: [sourceId],
                 disableVideo: selectedRoom.onlySound || selectedRoom.OwnerId==sourceId,
-                disableAudio: selectedRoom.OwnerId==sourceId,
                 dtx: true
             });
             //Get pc
