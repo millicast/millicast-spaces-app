@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap');
+  
+  ion-app, #dvSplashPWA{
+    max-width: 392px;
+    margin: 0 auto;
+  }
+
+body {  
+    background-color: #f4f4f4 !important;
+    font-family: var(--ion-font-family);
+    line-height: 1.6;
+    /*background-image: linear-gradient(to right top, #f2f2f2, #f4f4f4, #f7f7f7, #f9f9f9, #fcfcfc, #fcfcfc, #fcfcfc, #fcfcfc, #fafafa, #f8f8f8, #f6f6f6, #f4f4f4);*/
+  }
+  ion-content{
+      background-color: white;
+  }
+  ::-moz-selection {
+    color: #fff !important;
+    background: rgba(178, 105, 172, 0.55) !important;
+  }
+  
+  ::selection {
+    color: #fff !important;
+    background: rgba(178, 105, 172, 0.55) !important;
+  }
+  ion-app { 
+    margin-top: env(safe-area-inset-top); 
+    margin-bottom: env(safe-area-inset-bottom)  
+  }
+
+  /* botones nuevos redondeados */
+.btn{
+    display: inline-block;
+      font-weight: 600;
+      text-align: center;
+      vertical-align: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      border: 2px solid transparent;
+      padding: 14px 26px;
+      font-size: 0.95rem;
+      border-radius: 25px;
+      transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+      line-height: 1.6;
+      text-decoration: none;
+  }
+  .btn.btn-sm{
+    padding: 11px 20px;
+      font-size: 0.80rem;
+  }
+  .btn.btn-primary{
+    background-color: var(--ion-color-primary);
+    color: white;
+  }
+  .btn.btn-primary:hover{
+    background-color: var(--ion-color-primary-shade);
+    color: white;
+  }
+  .btn-primary:focus {
+    color: #fff;
+    background-color: var(--ion-color-primary-shade);
+    border-color: var(--ion-color-primary-shade);
+    box-shadow: 0 0 0 0.2rem var(--ion-color-primary-tint);
+  }
+  .btn-light{
+    background-color: white;
+    color: var(--ion-color-primary);
+  }
+  .btn.btn-light:hover{
+    background-color: #e2e6ea;
+    color: var(--ion-color-primary);
+  }
+  .btn.btn-light:focus{
+    background-color: #e2e6ea;
+      box-shadow: 0 0 0 0.2rem #d8d9db80;
+  }
+  .btn.btn-secondary{
+    background-color: var(--ion-color-secondary);
+    color: white;
+  }
+  .btn.btn-secondary:hover{
+    background-color: var(--ion-color-secondary-shade);
+    color: white;
+  }
+  .btn-secondary:focus {
+    color: #fff;
+    background-color: var(--ion-color-secondary-shade);
+    border-color: var(--ion-color-secondary-shade);
+    box-shadow: 0 0 0 0.2rem var(--ion-color-secondary-tint);
+  }
+  .btn.btn-outline-dark{
+    border: 2px solid #111;
+    color: #111;
+    background-color: transparent;
+  }
+  .btn.btn-outline-dark:hover{
+    background-color: #111;
+    border-color: #111;
+    color: white;
+  }
+  .btn.btn-outline-dark:focus{
+    background-color: #23272b;
+    border-color: #1d2124;
+    box-shadow: 0 0 0 0.2rem #52585d80;
+    color: white;
+  }
+  
+  .btn.btn-outline-primary{
+    border: 2px solid var(--ion-color-primary);
+    color: var(--ion-color-primary);
+    background-color: transparent;
+  }
+  .btn.btn-outline-primary:hover{
+    background-color: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    color: white;
+  }
+  .btn.btn-outline-primary:focus{
+    background-color: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    box-shadow: 0 0 0 0.2rem var(--ion-color-primary-shade);
+    color: white;
+  }
+  
+  .btn:focus{
+    outline: 0;
+  }
+
+.btn.withIcon{
+    position: relative;
+    padding-right: 38px;
+    i{
+        position: absolute;
+        right: 16px;
+        font-size: 16px;
+        color: white;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+    }
+}
+
+  .w100{
+    width: 100%;
+  }
+
+.form-control {
+    display: block;
+    width: 100%;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 25px;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.form-control-lg {
+    height: 56px;
+    padding: 14px 26px;
+    line-height: 1.6;
+}
+.mb10{
+    margin-bottom: 10px !important;
+  }
+  .mt30{
+    margin-top: 30px !important;
+  }
+  .mt20{
+    margin-top: 20px !important;
+  }
+  .ml5{
+    margin-left: 5px;
+  }
+  .mr5{
+    margin-right: 5px;
+  }
+  .mb20{
+    margin-bottom: 20px !important;
+  }
+  .mb30{
+    margin-bottom: 30px !important;
+  }
+  .text-center{
+    text-align: center;
+  }
+  .input-group {
+    position: relative;
+    width: 100%;
+}
+.input-group-prepend {
+    position: absolute;
+    left: 20px;
+    top:0;
+    z-index: 2;
+    bottom: 0;
+}
+.input-group-append, .input-group-prepend {
+    display: flex;
+}
+.input-group-text {
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: .375rem .75rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 25px;
+    color: var(--ion-color-primary);
+    
+}
+.input-group .form-control {
+    position: relative;
+    padding-left: 60px;
+}
+.form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #a18bd7;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgb(99 61 188 / 29%);
+}
+
+.gridBotoneraCabecera{
+  display: flex;
+  align-items: center;
+  > div{
+    margin-left: 15px;
+  }
+  .foto{
+    img{
+      height: 28px;
+      border-radius: 7px;
+      box-shadow: 0 7px 9px rgb(0 0 0 / 15%);
+    }
+  }
+  .icono{
+    img{
+      width: 21px;
+    }
+  }
+  .campana{
+    position: relative;
+    .circulo{
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      top: 1px;
+      right: 0;
+    }
+    &.online{
+      .circulo{
+        background-color: #01D85E;
+      }
+    }
+  }
+}
+.cabeceraInt{
+  h1{
+    font-weight: 21px;
+    font-weight: bold;
+    color: #181818;
+  }
+}
+.boxPadding{
+  padding: 20px;
+}
