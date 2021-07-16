@@ -34,7 +34,7 @@
 
             <ion-list>
                 <ion-title>
-                    Members
+                    Audience
                 </ion-title>
                 <ion-item v-for="member in room.members" :key="member.appToken">
                     <span v-bind:class="{ 'pendingRequest': (member.pendingRequest != null && member.pendingRequest && (loginData.appToken == room.OwnerId || loginData.appToken == member.appToken)) }">

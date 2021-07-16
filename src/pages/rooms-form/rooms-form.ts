@@ -39,7 +39,7 @@ export default defineComponent({
 
             await this.assignSockets();
 
-            await this.preparePublisher(usr, roomId);
+            await this.preparePublisher(usr, selectedRoom);
             await this.prepareViewer(usr, selectedRoom);
 
         },
@@ -67,19 +67,39 @@ export default defineComponent({
             };
 
         },
-        async preparePublisher(usr: LoginModel, roomId: string) {
+        async preparePublisher(usr: LoginModel, selectedRoom: RoomModel) {
 
             let sourceId = usr.appToken;
 
             if (usr.publisherToken != null) {
-                this.publisher = new Publish(roomId, () => { return usr.publisherToken });
+                this.publisher = new Publish(selectedRoom.Id, () => { return usr.publisherToken });
 
                 //Capture mic
-                let mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                let mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true , video: !selectedRoom.onlySound});
+                //Show local video
+                if (!selectedRoom.onlySound) {
+                    //Create new video element
+                    const element = document.createElement("video");
+                    //Set src stream
+                    element.srcObject = mediaStream;
+                    //Set other properties
+                    element.autoplay = true;
+                    element.controls = true;
+                    //Local video has to be muted and mirrored
+                    element.muted = true;
+                    element.style.transform = "scale(-1, 1)";
+                    element.addEventListener("click", function () {
+                        element.play();
+                        return false;
+                    });
+                    //Append it
+                    document.getElementById("cntViewerTags").appendChild(element);
+                }
                 await this.publisher.connect({
                     mediaStream,
                     sourceId,
-                    disableVideo:true
+                    disableVideo: selectedRoom.onlySound,
+                    dtx: true
                 })
             }
 
@@ -159,7 +179,10 @@ export default defineComponent({
             await this.viewer.connect({
                 pinnedSourceId: selectedRoom.OwnerId,	 // Set here the id of the room creator
                 multiplexedAudioTracks: 3,
-                excludedSourceIds: [sourceId]
+                excludedSourceIds: [sourceId],
+                disableVideo: selectedRoom.onlySound || selectedRoom.OwnerId==sourceId,
+                disableAudio: selectedRoom.OwnerId==sourceId,
+                dtx: true
             });
             //Get pc
             const pc = await this.viewer.getRTCPeerConnection();
