@@ -65,12 +65,12 @@ export default defineComponent({
 
                 if (currRoom != null && currRoom.Id == room.Id && currUsr != null) {
 
-                    let selectedUser = room.members.filter(f => f.appToken == currUsr.appToken)[0] || room.speakers.filter(f => f.appToken == currUsr.appToken)[0];
+                    let selectedUser = room.members.filter(f => f.id == currUsr.id)[0] || room.speakers.filter(f => f.id == currUsr.id)[0];
                     //TODO: Publishing token can't be broacasted to all the participants in the room
                     if (this.loginData.pendingRequest && !selectedUser.pendingRequest && selectedUser.publisherToken)
                         //Start publishing
                         this.preparePublisher(selectedUser, room);
-                    else if (!selectedUser.publisherToken && selectedUser.appToken!=room.OwnerId)
+                    else if (!selectedUser.publisherToken && selectedUser.id!=room.OwnerId)
                         //TODO: send specific event for demoting
                         this.stopPublisher()
                     this.loadRoom(room);
@@ -81,7 +81,7 @@ export default defineComponent({
             SocketModel.callbackUpdateRoomRequests = (room: RoomModel) => {
                 let currRoom: RoomModel = this.room;
                 let currUsr: LoginModel = this.loginData;
-                if (currRoom != null && currUsr != null && currRoom.OwnerId == currUsr.appToken && currRoom.Id == room.Id) {
+                if (currRoom != null && currUsr != null && currRoom.OwnerId == currUsr.id && currRoom.Id == room.Id) {
                     this.loadRoom(room);
                 }
             };
@@ -106,7 +106,7 @@ export default defineComponent({
         async preparePublisher(usr: LoginModel, selectedRoom: RoomModel) {
 
             //Get user id
-            const sourceId = usr.appToken;
+            const sourceId = usr.id;
 
             if (usr.publisherToken != null) {
                 this.publisher = new Publish(selectedRoom.Id, () => { return usr.publisherToken });
@@ -148,7 +148,7 @@ export default defineComponent({
         },
         async prepareViewer(usr: LoginModel, selectedRoom: RoomModel) {
 
-            let sourceId = usr.appToken;
+            let sourceId = usr.id;
 
             this.viewer = new View(selectedRoom.Id, () => { return usr.viewerToken });
 
@@ -221,7 +221,7 @@ export default defineComponent({
                                 oldSpeaker.audioLevel = 0;
                         }
                         //Find new speaker
-                        const speaker = this.room.speakers.find(s => s.appToken == data.sourceId);
+                        const speaker = this.room.speakers.find(s => s.id == data.sourceId);
                         //If got it
                         if (speaker) {
                                 //Assing multiplexing id
@@ -319,7 +319,7 @@ export default defineComponent({
 
             currUsr.pendingRequest = cancel;
 
-            let roomUsr = currRoom.members.filter(f => f.appToken == currUsr.appToken)[0]
+            let roomUsr = currRoom.members.filter(f => f.id == currUsr.id)[0]
             if (roomUsr != null) {
                 roomUsr.pendingRequest = cancel;
             }
