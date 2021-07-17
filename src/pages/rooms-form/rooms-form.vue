@@ -29,6 +29,7 @@
                     <span v-if="loginData.appToken == room.OwnerId && speaker.appToken != room.OwnerId">
                         <span @click="manageRequest(speaker.appToken, false)">Demote</span>
                     </span>
+                    <ion-label>{{speaker.audioLevel}}</ion-label>
                 </ion-item>
             </ion-list>
 
@@ -50,7 +51,10 @@
         </ion-content>   
              
         <ion-footer>
-
+            <ion-button expand="full" @click="toggleMute()" v-if="publishing">
+                <ion-label v-if="muted">Unmute</ion-label>
+                <ion-label v-else>Mute</ion-label>
+            </ion-button>
             <ion-button expand="full" @click="openRequestModal()" v-if="loginData.appToken == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
                 <ion-label>{{room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length}} pending requests</ion-label>
             </ion-button>
