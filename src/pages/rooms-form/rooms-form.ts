@@ -10,6 +10,8 @@ import SocketModel from '../../models/socket/socket';
 import requestsModal from '../requests-modal/requests-modal.vue';
 import { Director, Publish, View, Logger } from '@millicast/sdk'
 
+Logger.setLevel(Logger.DEBUG);
+
 export default defineComponent({
     name: 'RoomsForm',
     components: {
@@ -39,17 +41,14 @@ export default defineComponent({
 
             this.loadRoom(selectedRoom);
 
-            let usr = await SocketModel.GetRoomUser(roomId);
-
-            await this.loadRoomUser(usr);
-
-            await this.assignSockets();
+            const usr = await SocketModel.GetRoomUser(roomId);
 
             await Promise.all([
+                this.loadRoomUser(usr),
+                this.assignSockets(),
                 this.preparePublisher(usr, selectedRoom),
                 this.prepareViewer(usr, selectedRoom)
             ]);
-
         },
         async close() {
             await Promise.all([
@@ -105,6 +104,7 @@ export default defineComponent({
             return this.publisher.stop();
 	},
         async preparePublisher(usr: LoginModel, selectedRoom: RoomModel) {
+
             //Get user id
             const sourceId = usr.appToken;
 
@@ -137,7 +137,10 @@ export default defineComponent({
                     mediaStream : this.mediaStream,
                     sourceId : sourceId,
                     disableVideo: selectedRoom.onlySound,
-                    dtx: true
+                    dtx: true,
+                    peerConfig: {
+                        iceServers : []
+                    }
                 })
                 this.publishing = true;
             }
@@ -234,7 +237,10 @@ export default defineComponent({
                 multiplexedAudioTracks: 3,
                 excludedSourceIds: [sourceId],
                 disableVideo: selectedRoom.onlySound || selectedRoom.OwnerId==sourceId,
-                dtx: true
+                dtx: true,
+                peerConfig: {
+                    iceServers : []
+                }
             });
             //Get pc
             const pc = await this.viewer.getRTCPeerConnection();
