@@ -15,11 +15,11 @@
         <ion-content>
 
             <ion-list>
-                <ion-item v-for="member in (room.members != undefined ? room.members.filter(f => f.pendingRequest != null && f.pendingRequest) : [])" :key="member.appToken">
+                <ion-item v-for="member in (room.members != undefined ? room.members.filter(f => f.pendingRequest != null && f.pendingRequest) : [])" :key="member.id">
                     {{member.user}} 
                     <span>
-                        <span @click="manageRequest(member.appToken, true)">Promote</span>
-                        <span @click="manageRequest(member.appToken, false)">Refuse</span>
+                        <span @click="manageRequest(member.id, true)">Promote</span>
+                        <span @click="manageRequest(member.id, false)">Refuse</span>
                     </span>
                 </ion-item>
             </ion-list>

@@ -24,10 +24,10 @@
                 <ion-title>
                     Speakers
                 </ion-title>
-                <ion-item v-for="speaker in room.speakers" :key="speaker.appToken">
+                <ion-item v-for="speaker in room.speakers" :key="speaker.id">
                     {{speaker.user}} 
-                    <span v-if="loginData.appToken == room.OwnerId && speaker.appToken != room.OwnerId">
-                        <span @click="manageRequest(speaker.appToken, false)">Demote</span>
+                    <span v-if="loginData.id == room.OwnerId && speaker.id != room.OwnerId">
+                        <span @click="manageRequest(speaker.id, false)">Demote</span>
                     </span>
                     <ion-label>{{speaker.audioLevel}}</ion-label>
                 </ion-item>
@@ -37,12 +37,12 @@
                 <ion-title>
                     Audience
                 </ion-title>
-                <ion-item v-for="member in room.members" :key="member.appToken">
-                    <span v-bind:class="{ 'pendingRequest': (member.pendingRequest != null && member.pendingRequest && (loginData.appToken == room.OwnerId || loginData.appToken == member.appToken)) }">
+                <ion-item v-for="member in room.members" :key="member.id">
+                    <span v-bind:class="{ 'pendingRequest': (member.pendingRequest != null && member.pendingRequest && (loginData.id == room.OwnerId || loginData.id == member.id)) }">
                         {{member.user}} 
-                        <span v-if="loginData.appToken == room.OwnerId">
-                            <span @click="manageRequest(member.appToken, true)">Promote</span>
-                            <span v-if="member.pendingRequest != null && member.pendingRequest" @click="manageRequest(member.appToken, false)">Refuse</span>
+                        <span v-if="loginData.id == room.OwnerId">
+                            <span @click="manageRequest(member.id, true)">Promote</span>
+                            <span v-if="member.pendingRequest != null && member.pendingRequest" @click="manageRequest(member.id, false)">Refuse</span>
                         </span>
                     </span>
                 </ion-item>
@@ -55,17 +55,17 @@
                 <ion-label v-if="muted">Unmute</ion-label>
                 <ion-label v-else>Mute</ion-label>
             </ion-button>
-            <ion-button expand="full" @click="openRequestModal()" v-if="loginData.appToken == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
+            <ion-button expand="full" @click="openRequestModal()" v-if="loginData.id == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
                 <ion-label>{{room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length}} pending requests</ion-label>
             </ion-button>
 
-            <ion-label v-if="loginData.appToken == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length == 0">No requests</ion-label>
+            <ion-label v-if="loginData.id == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length == 0">No requests</ion-label>
 
-            <ion-button expand="full" @click="madeRequest(true)" v-if="loginData.appToken != room.OwnerId && (loginData.pendingRequest == null || loginData.pendingRequest == false) && room.speakers != null && room.speakers.filter(f => f.appToken == loginData.appToken).length == 0">
+            <ion-button expand="full" @click="madeRequest(true)" v-if="loginData.id != room.OwnerId && (loginData.pendingRequest == null || loginData.pendingRequest == false) && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
                 <ion-label>Made request</ion-label>
             </ion-button>
 
-            <ion-button expand="full" @click="madeRequest(false)" v-if="loginData.appToken != room.OwnerId && loginData.pendingRequest && room.speakers != null && room.speakers.filter(f => f.appToken == loginData.appToken).length == 0">
+            <ion-button expand="full" @click="madeRequest(false)" v-if="loginData.id != room.OwnerId && loginData.pendingRequest && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
                 <ion-label>Cancel request</ion-label>
             </ion-button>
 
