@@ -4,4 +4,6 @@ export default class LoginModel {
     public publisherToken: any
     public viewerToken: any
     public pendingRequest: boolean
+    public multiplexedId: string
+    public audioLevel: any
 }
