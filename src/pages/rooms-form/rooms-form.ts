@@ -4,6 +4,7 @@ import {
 } from '@ionic/vue';
 import { defineComponent } from 'vue';
 import LoginModel from '../../models/login/LoginModel';
+import TokenModel from '../../models/common/TokenModel';
 import RoomModel from '@/models/rooms/RoomModel';
 import { useRoute } from 'vue-router';
 import SocketModel from '../../models/socket/socket';
@@ -37,16 +38,17 @@ export default defineComponent({
             const route = useRoute();
 
             const roomId = route.params["roomId"].toString();
-
-            const usr = await SocketModel.GetRoomUser(roomId);
-            const selectedRoom = await SocketModel.GetRoomById(roomId)
+            //Read current user from global state
+            const user = this.$loginData;
+            //Join room and retrieve publisher and viewer stats
+            const {tokens , room} = await SocketModel.JoinRoom(roomId);
 
             await Promise.all([
-                this.loadRoomUser(usr),
-                this.loadRoom(selectedRoom),
+                this.loadRoomUser(user),
+                this.loadRoom(room),
                 this.assignSockets(),
-                this.preparePublisher(usr, selectedRoom),
-                this.prepareViewer(usr, selectedRoom)
+                this.preparePublisher(user, tokens, room),
+                this.prepareViewer(user, tokens, room)
             ]);
         },
         async close() {
@@ -58,6 +60,14 @@ export default defineComponent({
         },
         async assignSockets() {
 
+            SocketModel.callbackUserPromoted = async (roomId: string, tokens: TokenModel) => {
+                //Start publishing
+                this.preparePublisher(this.loginData, tokens, this.room);
+            };
+            SocketModel.callbackUserDemoted = async (roomId: string) => {
+                //Stop publishing
+                this.stopPublisher();
+            };
             SocketModel.callbackUpdateRoom = async (room: RoomModel) => {
                 let currRoom: RoomModel = this.room;
                 let currUsr: LoginModel = this.loginData;
@@ -65,15 +75,7 @@ export default defineComponent({
                 if (currRoom != null && currRoom.Id == room.Id && currUsr != null) {
 
                     let selectedUser = room.members.filter(f => f.id == currUsr.id)[0] || room.speakers.filter(f => f.id == currUsr.id)[0];
-                    //TODO: Publishing token can't be broacasted to all the participants in the room
-                    if (this.loginData.pendingRequest && !selectedUser.pendingRequest && selectedUser.publisherToken)
-                        //Start publishing
-                        this.preparePublisher(selectedUser, room);
-                    else if (!selectedUser.publisherToken && selectedUser.id!=room.OwnerId)
-                        //TODO: send specific event for demoting
-                        this.stopPublisher()
                     this.loadRoom(room);
-                    await this.preparePublisher(selectedUser, currRoom);
                     this.loadRoomUser(selectedUser);
                 }
             };
@@ -101,17 +103,19 @@ export default defineComponent({
             //Not publishing anymore
             this.publishing = false;
             //Stop publishing
-            return this.publisher.stop();
+            await this.publisher.stop();
+            //Done
+            this.publisher = null;
 	},
-        async preparePublisher(usr: LoginModel, selectedRoom: RoomModel) {
+        async preparePublisher(usr: LoginModel, tokens: TokenModel, room: RoomModel) {
 
             //Get user id
             const sourceId = usr.id;
 
-            if (usr.publisherToken != null && this.publisher == null) {
-                this.publisher = new Publish(selectedRoom.Id, () => { return usr.publisherToken });
+            if (tokens.publisherToken != null && this.publisher == null) {
+                this.publisher = new Publish(room.Id, () => { return tokens.publisherToken });
                 //We only capture video on video rooms and for the owner
-                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true , video: !selectedRoom.onlySound && selectedRoom.OwnerId==sourceId});
+                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true , video: !room.onlySound && room.OwnerId==sourceId});
                 //Not muted
                 this.muted = false;
                 //Show local video
@@ -136,24 +140,20 @@ export default defineComponent({
                 await this.publisher.connect({
                     mediaStream : this.mediaStream,
                     sourceId : sourceId,
-                    disableVideo: selectedRoom.onlySound,
+                    disableVideo: room.onlySound,
                     dtx: true,
                     peerConfig: {
                         iceServers : []
                     }
                 })
                 this.publishing = true;
-            }else if(usr.publisherToken == null && this.publisher != null) {
-                await this.stopPublisher();
-                this.publisher = null;
             }
-
         },
-        async prepareViewer(usr: LoginModel, selectedRoom: RoomModel) {
+        async prepareViewer(usr: LoginModel, tokens: TokenModel, room: RoomModel) {
 
             let sourceId = usr.id;
 
-            this.viewer = new View(selectedRoom.Id, () => { return usr.viewerToken });
+            this.viewer = new View(room.Id, () => { return tokens.viewerToken });
 
             this.viewer.on("track", (event) => {
                 //Get track and transceiver from event
@@ -236,10 +236,10 @@ export default defineComponent({
             });
 
             await this.viewer.connect({
-                pinnedSourceId: selectedRoom.OwnerId!=sourceId ? selectedRoom.OwnerId : null,
+                pinnedSourceId: room.OwnerId!=sourceId ? room.OwnerId : null,
                 multiplexedAudioTracks: 3,
                 excludedSourceIds: [sourceId],
-                disableVideo: selectedRoom.onlySound || selectedRoom.OwnerId==sourceId,
+                disableVideo: room.onlySound || room.OwnerId==sourceId,
                 dtx: true,
                 peerConfig: {
                     iceServers : []
@@ -285,9 +285,7 @@ export default defineComponent({
             this.room = room;
         },
         loadRoomUser(usr: LoginModel) {
-
             this.loginData = usr;
-
         },
         async openRequestModal() {
 
