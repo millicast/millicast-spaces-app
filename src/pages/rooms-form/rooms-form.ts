@@ -26,20 +26,21 @@ export default defineComponent({
     },
     methods: {
         async init() {
+            
             const route = useRoute();
 
             const roomId = route.params["roomId"].toString();
-            const selectedRoom = await SocketModel.GetRoomById(roomId)
 
-            this.loadRoom(selectedRoom);
+            await this.assignSockets(); //Lo primero asignamos el callback de los sockets
 
             let usr = await SocketModel.GetRoomUser(roomId);
 
             await this.loadRoomUser(usr);
 
-            await this.assignSockets();
+            const selectedRoom = await SocketModel.GetRoomById(roomId)
+            this.loadRoom(selectedRoom);
 
-            await this.preparePublisher(usr, roomId);
+            await this.preparePublisher(usr, selectedRoom);
             await this.prepareViewer(usr, selectedRoom);
 
         },
@@ -54,6 +55,7 @@ export default defineComponent({
                     let selectedUser = room.members.filter(f => f.appToken == currUsr.appToken)[0] || room.speakers.filter(f => f.appToken == currUsr.appToken)[0];
 
                     this.loadRoom(room);
+                    await this.preparePublisher(selectedUser, currRoom);
                     await this.loadRoomUser(selectedUser);
                 }
             };
@@ -67,20 +69,24 @@ export default defineComponent({
             };
 
         },
-        async preparePublisher(usr: LoginModel, roomId: string) {
+        async preparePublisher(usr: LoginModel, selectedRoom: RoomModel) {
 
             let sourceId = usr.appToken;
 
-            if (usr.publisherToken != null) {
-                this.publisher = new Publish(roomId, () => { return usr.publisherToken });
+            if (usr.publisherToken != null && this.publisher == null) {
+                this.publisher = new Publish(selectedRoom.Id, () => { return usr.publisherToken });
 
                 //Capture mic
-                let mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                let mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !selectedRoom.onlySound });
                 await this.publisher.connect({
                     mediaStream,
                     sourceId,
-                    disableVideo:true
+                    dtx: true,
+                    disableVideo: selectedRoom.onlySound
                 })
+            }else if(usr.publisherToken == null && this.publisher != null) {
+                await this.publisher.stop();
+                this.publisher = null;
             }
 
         },
@@ -134,13 +140,13 @@ export default defineComponent({
 
                 switch (name) {
                     case "active":
-                        console.log(`active source ${data.sourceId}`);
+                        //console.log(`active source ${data.sourceId}`);
                         break;
                     case "inactive":
-                        console.log(`inactive source ${data.sourceId}`);
+                        //console.log(`inactive source ${data.sourceId}`);
                         break;
                     case "vad":
-                        console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
+                        //console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
                         //Get audio tag
                         const audio: any = document.querySelector(`audio[data-mid="${data.mediaId}"]`);
                         //TODO: events may be received before the track is added
@@ -157,9 +163,11 @@ export default defineComponent({
             });
 
             await this.viewer.connect({
+                dtx: true,
                 pinnedSourceId: selectedRoom.OwnerId,	 // Set here the id of the room creator
                 multiplexedAudioTracks: 3,
-                excludedSourceIds: [sourceId]
+                excludedSourceIds: [sourceId],
+                disableVideo: selectedRoom.onlySound
             });
             //Get pc
             const pc = await this.viewer.getRTCPeerConnection();
@@ -241,5 +249,15 @@ export default defineComponent({
     },
     mounted() {
         this.init();
+    },
+    ionViewWillLeave(){
+
+        if(this.viewer != null){
+            this.viewer.stop();
+        }
+
+        if(this.publisher != null){
+            this.publisher.stop();
+        }
     }
 })
