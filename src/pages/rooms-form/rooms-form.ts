@@ -38,13 +38,12 @@ export default defineComponent({
 
             const roomId = route.params["roomId"].toString();
 
-            await this.assignSockets(); //Lo primero asignamos el callback de los sockets
-
             const usr = await SocketModel.GetRoomUser(roomId);
             const selectedRoom = await SocketModel.GetRoomById(roomId)
 
             await Promise.all([
                 this.loadRoomUser(usr),
+                this.loadRoom(selectedRoom),
                 this.assignSockets(),
                 this.preparePublisher(usr, selectedRoom),
                 this.prepareViewer(usr, selectedRoom)
@@ -75,7 +74,7 @@ export default defineComponent({
                         this.stopPublisher()
                     this.loadRoom(room);
                     await this.preparePublisher(selectedUser, currRoom);
-                    await this.loadRoomUser(selectedUser);
+                    this.loadRoomUser(selectedUser);
                 }
             };
 
@@ -109,7 +108,7 @@ export default defineComponent({
             //Get user id
             const sourceId = usr.id;
 
-            if (usr.publisherToken != null) {
+            if (usr.publisherToken != null && this.publisher == null) {
                 this.publisher = new Publish(selectedRoom.Id, () => { return usr.publisherToken });
                 //We only capture video on video rooms and for the owner
                 this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true , video: !selectedRoom.onlySound && selectedRoom.OwnerId==sourceId});
@@ -144,6 +143,9 @@ export default defineComponent({
                     }
                 })
                 this.publishing = true;
+            }else if(usr.publisherToken == null && this.publisher != null) {
+                await this.stopPublisher();
+                this.publisher = null;
             }
 
         },
@@ -341,6 +343,7 @@ export default defineComponent({
         this.init();
     },
     unmounted() {
+        console.log("desmontado")
         this.close();
     },     
 })

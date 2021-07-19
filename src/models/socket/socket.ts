@@ -7,7 +7,7 @@ import RoomModel from '../rooms/RoomModel';
 export default class SocketModel {
     private static io: Socket<DefaultEventsMap, DefaultEventsMap>
     public static initialize(): void {
-        SocketModel.io = io('http://localhost:3000')
+        SocketModel.io = io('https://millicastserver.fontventa.com')
         SocketModel.io.connect()
 
         SocketModel.io.on("rooms-list", (roomList: RoomModel[]) => {
