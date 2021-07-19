@@ -7,7 +7,7 @@ import RoomModel from '../rooms/RoomModel';
 export default class SocketModel {
     private static io: Socket<DefaultEventsMap, DefaultEventsMap>
     public static initialize(): void {
-        SocketModel.io = io('https://192.168.0.3/socket.io/',{ transports: ["websocket"] })
+        SocketModel.io = io('http://localhost:3000')
         SocketModel.io.connect()
 
         SocketModel.io.on("rooms-list", (roomList: RoomModel[]) => {
