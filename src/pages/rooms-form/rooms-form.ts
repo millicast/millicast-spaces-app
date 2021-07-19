@@ -37,11 +37,11 @@ export default defineComponent({
             const route = useRoute();
 
             const roomId = route.params["roomId"].toString();
-            const selectedRoom = await SocketModel.GetRoomById(roomId)
 
-            this.loadRoom(selectedRoom);
+            await this.assignSockets(); //Lo primero asignamos el callback de los sockets
 
             const usr = await SocketModel.GetRoomUser(roomId);
+            const selectedRoom = await SocketModel.GetRoomById(roomId)
 
             await Promise.all([
                 this.loadRoomUser(usr),
@@ -74,6 +74,7 @@ export default defineComponent({
                         //TODO: send specific event for demoting
                         this.stopPublisher()
                     this.loadRoom(room);
+                    await this.preparePublisher(selectedUser, currRoom);
                     await this.loadRoomUser(selectedUser);
                 }
             };
@@ -193,13 +194,13 @@ export default defineComponent({
 
                 switch (name) {
                     case "active":
-                        console.log(`active source ${data.sourceId}`);
+                        //console.log(`active source ${data.sourceId}`);
                         break;
                     case "inactive":
-                        console.log(`inactive source ${data.sourceId}`);
+                        //console.log(`inactive source ${data.sourceId}`);
                         break;
                     case "vad":
-                        console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
+                        //console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
                         //Get audio tag
                         const audio: any = document.querySelector(`audio[data-mid="${data.mediaId}"]`);
                         //TODO: events may be received before the track is added
