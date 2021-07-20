@@ -70,13 +70,22 @@
         }
         
     }
-    video{
-        display: none;
-    }
+   
     .gridSpeakers{
         display: flex;
         flex-wrap: wrap;
         margin: -20px;
+        .mainVideo {
+            flex-basis: 100%;
+            > video {
+                width: 100%;
+                object-fit: scale-down;
+                width: 100%;
+                border-radius: 25px;
+                overflow: hidden;
+                padding: 5px;
+            }
+        }
         > div{
             flex-basis: 33.3333%;
             > div{
@@ -116,18 +125,21 @@
             }
         }
     }
-    .hablando .foto .marco{
-        border: 2px solid #00DC84;
-        animation: pulse-green 2s infinite;
+    .multiplexed .foto .marco{
+            border: 2px solid #00DC84;
     }
-    .hablando .foto img{
-        
+    .hablando .foto .marco{
+        animation: pulse-green 1s infinite;
+    }
+    .multiplexed .foto img{
         border: 2px solid white;
     }
-    .hablando .circulo {
+    .circulo {
         background: #00DC84;
         box-shadow: 0 0 0 0 #00DC84;
-        animation: zoom 2s infinite;
+    } 
+    .hablando .circulo {
+        animation: zoom 1s infinite;
     }    
     
     @keyframes pulse-green {
