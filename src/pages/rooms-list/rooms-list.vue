@@ -31,7 +31,7 @@
                     <div class="cabeceraInt">
                         <h1>Rooms</h1>
                     </div>
-                    <div class="gridTarjetas">
+                    <div class="gridTarjetas" v-if="roomList.length >= 0"><!--change to >0 !-->
                         <div class="tarjeta">
                             <h2><i class="far fa-microphone"></i><span>How do I apply UX Design process in product ✒️🎨💻</span></h2>
                             <div class="cuerpo">
@@ -58,6 +58,33 @@
                                 </div>
                             </div>
                         </div>
+                        <!--dynamic list !-->
+                        <div class="tarjeta" v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
+                             <h2><i class="far" v-bind:class="roomItem.onlySound ? 'fa-microphone' : 'fa-camera'"></i><span>{{roomItem.name}}</span></h2>
+                             <div class="cuerpo">
+                                 <div>
+                                     <div class="fotos">
+                                         <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
+                                         <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
+                                     </div>
+                                 </div>
+                                 <div>
+                                     <div class="usuarios">
+                                         <ul>
+                                             <li v-for="member in roomItem.speakers.splice(0,4)" :key="member.id">{{member.user}}</li>
+                                         </ul>
+                                     </div>
+                                     <div class="badges">
+                                         <div>
+                                             <p>{{roomItem.speakers.length}}</p>
+                                             <img src="/assets/images/ico-speaker-morado.svg" alt="speaker" />
+                                             <p>{{roomItem.members.length}}</p>
+                                             <img src="/assets/images/ico-speaker-morado.svg" alt="audience" />
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                         </div>
                     </div>
                     <div class="central" v-if="roomList.length == 0">
                         <div class="icono">
@@ -73,18 +100,6 @@
                         <button class="btn btn-primary" @click="openRoomModal()"><i class="fal fa-plus marginright"></i>Create room</button>
                     </div>
                 </div>
-                
-                <!-- Dinámico -->
-                <div v-if="roomList.length > 0">
-
-                     <div v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
-                        Room: {{roomItem.name}} <br/>
-                        Type: {{(roomItem.onlySound ? 'Sound only' : 'Sound and video')}} <br/>
-                        Participants: {{roomItem.speakers.length + roomItem.members.length}}
-                    </div>
-
-                </div>
-                
             <div class="trianguloAbsolute">
                 <img src="/assets/images/triangle.svg" alt="triangle" />
             </div>
