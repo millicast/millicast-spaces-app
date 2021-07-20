@@ -3,11 +3,18 @@ import { DefaultEventsMap } from 'socket.io-client/build/typed-events'
 import LoginModel from '../login/LoginModel';
 import ResultModel from '../common/ResultModel';
 import RoomModel from '../rooms/RoomModel';
+import TokenModel from '../common/TokenModel';
+
+class JoinModel
+{
+    tokens: TokenModel
+    room: RoomModel
+}
 
 export default class SocketModel {
     private static io: Socket<DefaultEventsMap, DefaultEventsMap>
     public static initialize(): void {
-        SocketModel.io = io('http://localhost:3000')
+        SocketModel.io = io('https://millicastserver.fontventa.com')
         SocketModel.io.connect()
 
         SocketModel.io.on("rooms-list", (roomList: RoomModel[]) => {
@@ -31,6 +38,18 @@ export default class SocketModel {
         SocketModel.io.on("room-requests-modal", (room: RoomModel) => {
             if (SocketModel.callbackUpdateRequestsModal != null) {
                 SocketModel.callbackUpdateRequestsModal(room)
+            }
+        })
+
+        SocketModel.io.on("user-promoted", (roomId: string, tokens: TokenModel) => {
+            if (SocketModel.callbackUserPromoted != null) {
+                SocketModel.callbackUserPromoted(roomId, tokens);
+            }
+        })
+
+        SocketModel.io.on("user-demoted", (roomId: string) => {
+            if (SocketModel.callbackUserDemoted != null) {
+                SocketModel.callbackUserDemoted(roomId);
             }
         })
     }
@@ -114,9 +133,9 @@ export default class SocketModel {
         })
     }
 
-    public static JoinRoom(roomId: string): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            SocketModel.io.emit('join-room', roomId, (result: ResultModel<void>) => {
+    public static JoinRoom(roomId: string): Promise<JoinModel> {
+        return new Promise<JoinModel>((resolve, reject) => {
+            SocketModel.io.emit('join-room', roomId, (result: ResultModel<JoinModel>) => {
                 if (result.Error.HasError) {
                     reject(new Error(result.Error.Message))
                 } else {
@@ -154,6 +173,8 @@ export default class SocketModel {
     public static callbackUpdateRoom: (room: RoomModel) => void
     public static callbackUpdateRoomRequests: (room: RoomModel) => void
     public static callbackUpdateRequestsModal: (room: RoomModel) => void
+    public static callbackUserPromoted: (roomId: string, tokens: TokenModel) => void
+    public static callbackUserDemoted: (roomId: string) => void
 
     //#endregion
 

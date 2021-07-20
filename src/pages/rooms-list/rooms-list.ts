@@ -50,7 +50,6 @@ export default defineComponent({
 
         },
         async goToRoom(roomId: string) {
-            await SocketModel.JoinRoom(roomId)
             this.$router.push({ path: `/roomsform/${roomId}` })
         },
         async exitRooms() {

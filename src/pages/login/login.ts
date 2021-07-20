@@ -24,7 +24,7 @@ export default defineComponent({
                 let authenticationResult = await SocketModel.Authenticate(this.loginData.user)
                 
                 this.$loginData.user = authenticationResult.user
-                this.$loginData.appToken = authenticationResult.appToken
+                this.$loginData.id = authenticationResult.id
 
                 this.$router.replace('/roomslist')
             } catch (ex) {
