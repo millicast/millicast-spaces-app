@@ -1,5 +1,4 @@
 #pgRoomsList{
-    
     .trianguloAbsolute{
         position: absolute;
         right: 0;
@@ -38,6 +37,13 @@
                 font-size: 16px;
                 color: #777777;
             }
+        }
+    }
+    .gridTarjetas{
+        .tarjeta{
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.06);
         }
     }
 }

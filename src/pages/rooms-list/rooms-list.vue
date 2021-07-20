@@ -1,14 +1,6 @@
 <template>
     <ion-page id="pgRoomsList">
         <ion-header>
-            <!--<ion-toolbar>
-                <ion-buttons>
-                    <ion-back-button></ion-back-button>
-                </ion-buttons>
-                <ion-title>
-                    Rooms
-                </ion-title>
-            </ion-toolbar>-->
             <ion-toolbar>
                 <ion-buttons slot="start">
                     <ion-button>
@@ -18,15 +10,12 @@
                 <ion-buttons slot="end">
                     <div class="gridBotoneraCabecera">
                         <div class="icono campana">
-                            <!--<i class="far fa-bell"></i>-->
                             <img src="/assets/images/ico-correo.svg" alt="Campana" />
                         </div>
                         <div class="icono campana">
-                            <!--<i class="far fa-bell"></i>-->
                             <img src="/assets/images/ico-calendario.svg" alt="Campana" />
                         </div>
                         <div class="icono campana online">
-                            <!--<i class="far fa-bell"></i>-->
                             <img src="/assets/images/ico-campana.svg" alt="Campana" />
                             <div class="circulo"></div>
                         </div>
@@ -38,34 +27,62 @@
             </ion-toolbar>
         </ion-header>
         <ion-content>
-            
                 <div class="estructuraFlex">
                     <div class="cabeceraInt">
                         <h1>Rooms</h1>
                     </div>
-                    <div class="central">
+                    <div class="gridTarjetas">
+                        <div class="tarjeta">
+                            <h2><i class="far fa-microphone"></i><span>How do I apply UX Design process in product ✒️🎨💻</span></h2>
+                            <div class="cuerpo">
+                                <div>
+                                    <div class="fotos">
+                                        <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
+                                        <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="usuarios">
+                                        <ul>
+                                            <li>Ariel Brailovsky</li>
+                                            <li>Ariel Brailovsky</li>
+                                            <li>Ariel Brailovsky</li>
+                                        </ul>
+                                    </div>
+                                    <div class="badges">
+                                        <div>
+                                            <p>4</p>
+                                            <img src="/assets/images/ico-speaker-morado.svg" alt="speaker" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="central" v-if="roomList.length == 0">
                         <div class="icono">
                             <img src="/assets/images/ico-podcast.svg" alt="podcast" />
                         </div>
                         <h2>Hi Peter!</h2>
                         <p>It seems that there are no open rooms</p>
                         <p>
-                            <button class="botonLink">Create a new room here<i class="fas fa-arrow-right"></i></button>
+                            <button class="botonLink" @click="openRoomModal()">Create a new room here<i class="fas fa-arrow-right"></i></button>
                         </p>
                     </div>
                     <div class="text-center">
                         <button class="btn btn-primary" @click="openRoomModal()"><i class="fal fa-plus marginright"></i>Create room</button>
-                        <!--<ion-button expand="full" @click="openRoomModal()">
-                            <ion-label>Create room</ion-label>
-                        </ion-button>-->
                     </div>
                 </div>
                 
                 <!-- Dinámico -->
-                <div v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
-                    Room: {{roomItem.name}} <br/>
-                    Type: {{(roomItem.onlySound ? 'Sound only' : 'Sound and video')}} <br/>
-                    Participants: {{roomItem.speakers.length + roomItem.members.length}}
+                <div v-if="roomList.length > 0">
+
+                     <div v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
+                        Room: {{roomItem.name}} <br/>
+                        Type: {{(roomItem.onlySound ? 'Sound only' : 'Sound and video')}} <br/>
+                        Participants: {{roomItem.speakers.length + roomItem.members.length}}
+                    </div>
+
                 </div>
                 
             <div class="trianguloAbsolute">
@@ -75,11 +92,6 @@
                 <img src="/assets/images/elipse-morada.svg" alt="elipse" />
             </div>
         </ion-content>
-        <!--<ion-footer>
-            <ion-button expand="full" @click="openRoomModal()">
-                <ion-label>Create room</ion-label>
-            </ion-button>
-        </ion-footer>-->
     </ion-page>
 </template>
 <script src="./rooms-list.ts" lang="ts"></script>
