@@ -29,6 +29,14 @@ export default defineComponent({
             muted: false
         }
     },
+    computed: {
+        audioOnlySpeakers : function() {
+            return this.room.onlySound ?   this.room.speakers : this.room.speakers.filter(m => m.id!=this.room.OwnerId);
+        },
+        owner : function() {
+            return this.room.speakers.find(m => m.id==this.room.OwnerId);
+        }
+    },
     methods: {
         async init() {
             const cntViewerTags = document.getElementById("cntViewerTags")
@@ -106,7 +114,9 @@ export default defineComponent({
             await this.publisher.stop();
             //Done
             this.publisher = null;
-	},
+            //Stop stats interval
+            clearInterval(this.publishingStats);
+	    },
         async preparePublisher(usr: LoginModel, tokens: TokenModel, room: RoomModel) {
 
             //Get user id
@@ -120,22 +130,18 @@ export default defineComponent({
                 this.muted = false;
                 //Show local video
                 if (this.mediaStream.getVideoTracks().length) {
-                    //Create new video element
-                    const element = document.createElement("video");
+                    //Get video element
+                    const element = document.querySelector(".mainVideo video") as HTMLVideoElement;
                     //Set src stream
                     element.srcObject = this.mediaStream;
-                    //Set other properties
-                    element.autoplay = true;
-                    element.controls = true;
                     //Local video has to be muted and mirrored
                     element.muted = true;
                     element.style.transform = "scale(-1, 1)";
+                    element.play();
                     element.addEventListener("click", function () {
                         element.play();
                         return false;
                     });
-                    //Append it
-                    document.getElementById("cntViewerTags").appendChild(element);
                 }
                 await this.publisher.connect({
                     mediaStream : this.mediaStream,
@@ -147,6 +153,19 @@ export default defineComponent({
                     }
                 })
                 this.publishing = true;
+                //Get pc
+                const pc = await this.viewer.getRTCPeerConnection();
+                //Get stats periodically
+                this.publishingStats = setInterval(async () => {
+                    const stats = await pc.getStats();
+                    for (const [name, stat] of stats) {
+                        //Find the audio stat
+                        if (stat.kind == "audio" && stat.type == "media-source") {
+                            //Set our audio level
+                            this.loginData.audioLevel = stat.audioLevel;
+                        }
+                    }
+                }, 100);
             }
         },
         async prepareViewer(usr: LoginModel, tokens: TokenModel, room: RoomModel) {
@@ -161,33 +180,56 @@ export default defineComponent({
                 const transceiver = event.transceiver;
                 //Get stream
                 let stream = event.streams[0];
-
-                //Do not duplicate
-                if (document.getElementById(stream.id))
-                    return;
-                //Create new video element
-                const element = document.createElement(stream.getVideoTracks().length ? "video" : "audio");
-                //If it is multiaudio
-                if (stream.getAudioTracks().length > 1)
-                    //New stream
-                    stream = new MediaStream([track]);
-                //Set same id
-                element.id = stream.id;
-                //Set trackId mediaId as data
-                element.dataset.trackId = track.id;
-                element.dataset.mid = transceiver.mid;
-                //Set src stream
-                element.srcObject = stream;
-                //Set other properties
-                element.autoplay = true;
-                element.controls = true;
-                element.muted = false;
-                element.addEventListener("click", function () {
+                //If it is main video
+                if (stream.getVideoTracks().length)
+                {
+                try{
+                    //Get video element
+                    const element = document.querySelector(".mainVideo video") as HTMLVideoElement;
+                    //Do not duplicate
+                    if (element.id == stream.id)
+                        return;
+                    //Set same id
+                    element.id = stream.id;
+                    //Set src stream
+                    element.srcObject = stream;
+                    //Set other properties
+                    element.autoplay = true;
+                    element.muted = false;
                     element.play();
-                    return false;
-                });
-                //Append it
-                document.getElementById("cntViewerTags").appendChild(element);
+                    element.addEventListener("click", function () {
+                        element.play();
+                        return false;
+                    });
+                    }catch(e){ console.log(e)}
+                } else {
+                    //Do not duplicate
+                    if (document.getElementById(stream.id))
+                        return;
+                    //Create new video element
+                    const element = document.createElement("audio");
+                    //If it is multiaudio
+                    if (stream.getAudioTracks().length > 1)
+                        //New stream
+                        stream = new MediaStream([track]);
+                    //Set same id
+                    element.id = stream.id;
+                    //Set trackId mediaId as data
+                    element.dataset.trackId = track.id;
+                    element.dataset.mid = transceiver.mid;
+                    //Set src stream
+                    element.srcObject = stream;
+                    //Set other properties
+                    element.autoplay = true;
+                    element.controls = true;
+                    element.muted = false;
+                    element.addEventListener("click", function () {
+                        element.play();
+                        return false;
+                    });
+                    //Append it
+                    document.getElementById("cntViewerTags").appendChild(element);
+                }
             });
 
             this.viewer.on("broadcastEvent", (event) => {
