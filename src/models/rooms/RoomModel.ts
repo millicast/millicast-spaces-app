@@ -6,4 +6,10 @@ export default class RoomModel {
     public onlySound: boolean
     public speakers: LoginModel[]
     public members: LoginModel[]
+
+    constructor()
+    {
+        this.speakers = [];
+        this.members = [];
+    }
 }
