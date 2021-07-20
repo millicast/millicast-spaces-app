@@ -38,27 +38,51 @@
             </ion-toolbar>
         </ion-header>
         <ion-content>
-            <div class="boxPadding">
-                <div class="cabeceraInt">
-                    <h1>Rooms</h1>
+            
+                <div class="estructuraFlex">
+                    <div class="cabeceraInt">
+                        <h1>Rooms</h1>
+                    </div>
+                    <div class="central">
+                        <div class="icono">
+                            <img src="/assets/images/ico-podcast.svg" alt="podcast" />
+                        </div>
+                        <h2>Hi Peter!</h2>
+                        <p>It seems that there are no open rooms</p>
+                        <p>
+                            <button class="botonLink">Create a new room here<i class="fas fa-arrow-right"></i></button>
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" @click="openRoomModal()"><i class="fal fa-plus marginright"></i>Create room</button>
+                        <!--<ion-button expand="full" @click="openRoomModal()">
+                            <ion-label>Create room</ion-label>
+                        </ion-button>-->
+                    </div>
                 </div>
-                <ion-list>
-                    <ion-item v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
-                        Room: {{roomItem.name}} <br/>
-                        Type: {{(roomItem.onlySound ? 'Sound only' : 'Sound and video')}} <br/>
-                        Participants: {{roomItem.speakers.length + roomItem.members.length}}
-                    </ion-item>
-                </ion-list>
+                
+                <!-- Dinámico -->
+                <div v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
+                    Room: {{roomItem.name}} <br/>
+                    Type: {{(roomItem.onlySound ? 'Sound only' : 'Sound and video')}} <br/>
+                    Participants: {{roomItem.speakers.length + roomItem.members.length}}
+                </div>
+                
+            <div class="trianguloAbsolute">
+                <img src="/assets/images/triangle.svg" alt="triangle" />
+            </div>
+            <div class="trianguloAbsoluteElipse">
+                <img src="/assets/images/elipse-morada.svg" alt="elipse" />
             </div>
         </ion-content>
-        <ion-footer>
+        <!--<ion-footer>
             <ion-button expand="full" @click="openRoomModal()">
                 <ion-label>Create room</ion-label>
             </ion-button>
-        </ion-footer>
+        </ion-footer>-->
     </ion-page>
 </template>
 <script src="./rooms-list.ts" lang="ts"></script>
-<style>
+<style lang="scss">
   @import './rooms-list.scss';
 </style>

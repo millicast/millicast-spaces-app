@@ -1,3 +1,162 @@
-#pgRoomsForm .pendingRequest {
-    color:green;
+#pgRoomsForm{
+    .btnMenuInterior{
+        background: none;
+        font-size: 22px;
+    }
+    .trianguloAbsolute{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        height: 327px;
+        width: 100%;
+        transform: translateX(50%);
+    }
+    .estructuraFlex{
+        /*display: flex;
+        justify-content: space-between;
+        flex-direction: column;*/
+        padding: 35px 20px;
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        .central{
+            text-align: center;
+            .icono{
+                margin-bottom: 15px;
+            }
+            h2{
+                font-size: 20px;
+                font-weight: 600;
+            }
+            p{
+                font-size: 16px;
+                color: #777777;
+            }
+        }
+    }
+
+    .titular{
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        position: relative;
+        &:before{
+            content: '';
+            position: absolute;
+            right: 0;
+            bottom: 1px;
+            height: 1px;
+            background-color: #BAC4D3;
+            width:96%;
+        }
+        div{
+            background-color: white;
+            position: relative;
+            z-index: 2;
+            min-height: 25px;
+        }
+        img{
+            margin-right: 12px;
+            vertical-align: 4px;
+        }
+        h3{
+            margin: 0;
+            font-size: 14px;
+            font-weight: normal;
+            span{
+                color: #A2B0C5;
+            }
+        }
+        
+    }
+    video{
+        display: none;
+    }
+    .gridSpeakers{
+        display: flex;
+        flex-wrap: wrap;
+        margin: -20px;
+        > div{
+            flex-basis: 33.3333%;
+            > div{
+                margin: 20px;
+            }
+        }
+        h4{
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            margin: 0;
+        }
+        .foto{
+            margin-bottom: 5px;
+            position: relative;
+            .marco{
+                border-radius: 25px;
+                border: 2px solid transparent;
+            }
+            img{
+                border-radius: 25px;
+                display: block;
+                border: 2px solid transparent;
+            }
+            .circulo{
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 29px;
+                height: 29px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 15px;
+                border-radius: 50%;
+            }
+        }
+    }
+    .hablando .foto .marco{
+        border: 2px solid #00DC84;
+        animation: pulse-green 2s infinite;
+    }
+    .hablando .foto img{
+        
+        border: 2px solid white;
+    }
+    .hablando .circulo {
+        background: #00DC84;
+        box-shadow: 0 0 0 0 #00DC84;
+        animation: zoom 2s infinite;
+    }    
+    
+    @keyframes pulse-green {
+        0% {
+            /*transform: scale(0.95);*/
+            box-shadow: 0 0 0 0 rgba(51, 217, 178, 0.7);
+        }
+        
+        70% {
+            /*transform: scale(1);*/
+            box-shadow: 0 0 0 10px rgba(51, 217, 178, 0);
+        }
+        
+        100% {
+            /*transform: scale(0.95);*/
+            box-shadow: 0 0 0 0 rgba(51, 217, 178, 0);
+        }
+    }
+    @keyframes zoom {
+        0% {
+            transform: scale(0.95);
+        }
+        
+        70% {
+            transform: scale(1);
+        }
+        
+        100% {
+            transform: scale(0.95);
+        }
+    }
 }

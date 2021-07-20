@@ -8,23 +8,49 @@
                     </ion-button>
                 </ion-buttons>
                 <ion-title>
-                    Create room
+                    Create new room
                 </ion-title>
             </ion-toolbar>
         </ion-header>
         <ion-content>
-            <ion-item lines="full">
-                <ion-label position="floating">Room name</ion-label>
-                <ion-input type="text" @input="room.name=$event.target.value"></ion-input>
-            </ion-item>
-            <div @click="room.onlySound = false;" v-bind:class="{ 'active': (room.onlySound != null && !room.onlySound) }">SOUND AND VIDEO</div>
-            <div @click="room.onlySound = true;" v-bind:class="{ 'active': (room.onlySound != null && room.onlySound) }">SOUND ONLY</div>
+            <div class="boxPadding">
+                <ion-item class="boxInput" lines="none">
+                    <ion-label position="floating">Enter the name of the room</ion-label>
+                    <ion-input type="text" @input="room.name=$event.target.value"></ion-input>
+                </ion-item>
+
+                <div class="gridBotones mt30 mb30">
+                    <div>
+                        <div>
+                            <div class="itemSeleccion" @click="room.onlySound = true;" v-bind:class="{ 'active': (room.onlySound != null && room.onlySound) }">
+                                <img src="/assets/images/ico-audio.svg" alt="audio" />
+                                <p>Audio only</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div>
+                            <div class="itemSeleccion" @click="room.onlySound = false;" v-bind:class="{ 'active': (room.onlySound != null && !room.onlySound) }">
+                                <img src="/assets/images/ico-video.svg" alt="video" />
+                                <p>Audio and Video</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="separatorHorizontal">
+                    <p>Create a new room open for everyone</p>
+                    <button class="btn btn-primary" @click="createRoom()" :disabled="room.name == '' || room.name == null || room.onlySound == null">Go</button>
+                </div>
+
+            <!--<div @click="room.onlySound = false;" v-bind:class="{ 'active': (room.onlySound != null && !room.onlySound) }">SOUND AND VIDEO</div>
+            <div @click="room.onlySound = true;" v-bind:class="{ 'active': (room.onlySound != null && room.onlySound) }">SOUND ONLY</div>-->
+            </div>
         </ion-content>
-        <ion-footer>
+        <!--<ion-footer>
             <ion-button expand="full" @click="createRoom()" :disabled="room.name == '' || room.name == null || room.onlySound == null">
                 <ion-label>Create</ion-label>
             </ion-button>
-        </ion-footer>
+        </ion-footer>-->
     </ion-page>
 </template>
 <script src="./rooms-modal.ts" lang="ts"></script>

@@ -6,11 +6,67 @@
                     <ion-back-button></ion-back-button>
                 </ion-buttons>
                 <ion-title>
-                    Room {{room.name}}
+                    Room
                 </ion-title>
             </ion-toolbar>
         </ion-header>
         <ion-content>
+
+            <div class="estructuraFlex">
+                <div class="cabeceraInt flex">
+                    <div>
+                        <h2>{{room.name}}</h2>
+                    </div>
+                    <div>
+                        <button class="btnMenuInterior">
+                            <i class="far fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                    
+                </div>
+                <div class="titular mb30">
+                    <div>
+                        <img src="/assets/images/ico-speaker.svg" alt="speaker" />
+                    </div>
+                    <div>
+                        <h3>Speakers <span>(9)</span></h3>
+                    </div>
+                </div>
+                <div class="gridSpeakers">
+                    <div v-for="speaker in room.speakers" :key="speaker.appToken" class="hablando porEncima">
+                        <div>
+                            <div class="foto">
+                                <div class="marco">
+                                    <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
+                                </div>
+                                <div class="circulo">
+                                    <i class="far fa-microphone"></i>
+                                </div>
+                            </div>
+                            <h4>{{speaker.user}}</h4>
+                            <span v-if="loginData.appToken == room.OwnerId && speaker.appToken != room.OwnerId">
+                                <span @click="manageRequest(speaker.appToken, false)">Demote</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="hablando porEncima">
+                        <div>
+                            <div class="foto">
+                                <div class="marco">
+                                    <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
+                                </div>
+                                <div class="circulo">
+                                    <i class="far fa-microphone"></i>
+                                </div>
+                            </div>
+                            <h4>Bea</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="trianguloAbsolute">
+                <img src="/assets/images/triangle.svg" alt="triangle" />
+            </div>
 
             <div id="cntPublisherTags">
 
@@ -19,8 +75,10 @@
             <div id="cntViewerTags">
 
             </div>
+            
+            
 
-            <ion-list>
+            <!--<ion-list>
                 <ion-title>
                     Speakers
                 </ion-title>
@@ -30,7 +88,7 @@
                         <span @click="manageRequest(speaker.appToken, false)">Demote</span>
                     </span>
                 </ion-item>
-            </ion-list>
+            </ion-list>-->
 
             <ion-list>
                 <ion-title>

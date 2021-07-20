@@ -1,3 +1,61 @@
-#pgRoomsModal .active{
-    background-color:greenyellow;
+
+.itemSeleccion{
+    text-align: center;
+    padding: 25px;
+    border-radius: 25px;
+    border: 1px solid transparent;
+    img{
+        margin-bottom: 2px;
+    }
+    p{
+        font-size: 12px;
+        margin-bottom: 0;
+    }
+}
+#pgRoomsModal .itemSeleccion.active{
+    background-color: #F4F7FC;
+    border-color: #CDDAEC
+}
+.gridBotones{
+    display: flex;
+    margin: -15px;
+    > div{
+        flex-basis: 50%;
+        > div{
+            margin: 15px;
+        }
+    }
+}
+ion-item, .item-native{
+    --inner-padding-start: 0;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --padding-end: 0;
+}
+.boxInput ion-label{
+    margin-left: 35px;
+    font-size: 14px !important;
+    color: #A2B0C5;
+    margin-top: 15px;
+}
+.boxInput ion-input{
+    border: 1px solid #CDDAEC;
+    border-radius: 25px;
+    padding-left: 25px;
+    input{
+        --padding-start: 30px;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #181818 !important;
+    }
+}
+.separatorHorizontal{
+    border-top: 1px solid #CCCCCC;
+    padding-top: 15px;
+    text-align: center;
+    p{
+        font-size: 12px;
+        color: #777777;
+        margin-bottom: 20px;
+    }
 }

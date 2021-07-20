@@ -1,9 +1,43 @@
-ion-toolbar{
-    --background: white;
-    --border-width: 0;
-    --padding-top: 12px;
-    --padding-bottom: 12px;
-    --padding-start: 20px;
-    --padding-end: 20px;
-    --border-color: white;
+#pgRoomsList{
+    
+    .trianguloAbsolute{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        height: 327px;
+        width: 100%;
+        transform: translateX(50%);
+    }
+    .trianguloAbsoluteElipse{
+        position: absolute;
+        top: 0;
+        left: -61px;
+        z-index: 0;
+        height: 100px;
+        width: 100%;
+    }
+    .estructuraFlex{
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        padding: 35px 20px;
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        .central{
+            text-align: center;
+            .icono{
+                margin-bottom: 15px;
+            }
+            h2{
+                font-size: 20px;
+                font-weight: 600;
+            }
+            p{
+                font-size: 16px;
+                color: #777777;
+            }
+        }
+    }
 }
