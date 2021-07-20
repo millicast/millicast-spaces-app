@@ -17,6 +17,7 @@ export default defineComponent({
     },
     data() {
         return {
+            loginData: new LoginModel(),
             roomList: []
         }
     },
@@ -35,6 +36,9 @@ export default defineComponent({
 
             }
 
+        },
+        loaduserData(){
+            this.loginData.user = this.$loginData.user;
         },
         async openRoomModal() {
 
@@ -57,6 +61,7 @@ export default defineComponent({
         }
     },
     ionViewDidEnter() {
+        this.loaduserData();
         this.exitRooms();
         this.initRooms();
 

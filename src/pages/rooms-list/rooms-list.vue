@@ -63,7 +63,7 @@
                         <div class="icono">
                             <img src="/assets/images/ico-podcast.svg" alt="podcast" />
                         </div>
-                        <h2>Hi Peter!</h2>
+                        <h2>Hi {{loginData.user}}!</h2>
                         <p>It seems that there are no open rooms</p>
                         <p>
                             <button class="botonLink" @click="openRoomModal()">Create a new room here<i class="fas fa-arrow-right"></i></button>
