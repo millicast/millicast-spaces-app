@@ -143,6 +143,7 @@ export default defineComponent({
                         return false;
                     });
                 }
+                this.publishing = true;
                 await this.publisher.connect({
                     mediaStream : this.mediaStream,
                     sourceId : sourceId,
@@ -152,17 +153,20 @@ export default defineComponent({
                         iceServers : []
                     }
                 })
-                this.publishing = true;
                 //Get pc
-                const pc = await this.viewer.getRTCPeerConnection();
+                const pc = await this.publisher.getRTCPeerConnection();
                 //Get stats periodically
                 this.publishingStats = setInterval(async () => {
                     const stats = await pc.getStats();
                     for (const [name, stat] of stats) {
                         //Find the audio stat
                         if (stat.kind == "audio" && stat.type == "media-source") {
+                            //Find us
+                            const us = this.room.speakers.find(s=>s.id==this.loginData.id);
                             //Set our audio level
-                            this.loginData.audioLevel = stat.audioLevel;
+                            us.audioLevel = stat.audioLevel;
+                            //Done
+                            return;
                         }
                     }
                 }, 100);
@@ -183,7 +187,6 @@ export default defineComponent({
                 //If it is main video
                 if (stream.getVideoTracks().length)
                 {
-                try{
                     //Get video element
                     const element = document.querySelector(".mainVideo video") as HTMLVideoElement;
                     //Do not duplicate
@@ -201,7 +204,6 @@ export default defineComponent({
                         element.play();
                         return false;
                     });
-                    }catch(e){ console.log(e)}
                 } else {
                     //Do not duplicate
                     if (document.getElementById(stream.id))
@@ -291,6 +293,18 @@ export default defineComponent({
             const pc = await this.viewer.getRTCPeerConnection();
             //Get stats periodically
             setInterval(async () => {
+                //IF we are not the owners
+                if (this.loginData.id!=this.room.OwnerId) {
+                    //Get first audio transceiver
+                    const mainAudio = pc.getTransceivers().filter(t=>t.receiver.track.kind=="audio")[0];
+                    //Find ownser
+                    const owner = this.room.speakers.find(s => s.id == this.room.OwnerId);
+                    //Set mid
+                    if (mainAudio && owner)
+                        //Set it
+                        owner.multiplexedId = mainAudio.mid;
+                }
+                //Find 
                 const stats = await pc.getStats();
                 for (const [name, stat] of stats) {
                     //Find the audio stat
@@ -320,6 +334,7 @@ export default defineComponent({
                         }
                     }
                 }
+                
             }, 100);
 
         },
