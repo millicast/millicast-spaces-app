@@ -107,7 +107,7 @@
                                     <div>
                                         <div>
                                             <p>{{roomItem.members.length}}</p>
-                                            <img src="/assets/images/ico-chat-morado.svg" alt="members" />
+                                            <img src="/assets/images/ico-audience-morado.svg" alt="audience" />
                                         </div>
                                     </div>
                                 </div>

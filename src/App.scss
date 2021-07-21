@@ -101,6 +101,17 @@ ion-app {
     background-color: #e2e6ea;
       box-shadow: 0 0 0 0.2rem #d8d9db80;
   }
+  .btn.btn-redondeado{
+    border-radius: 50%;
+    min-width: initial;
+    width: 36px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .btn-default{
+    background-color: #E7EBF1;
+    color: #181818;
+  }
   .btn.btn-secondary{
     background-color: var(--ion-color-secondary);
     color: white;
@@ -114,6 +125,11 @@ ion-app {
     background-color: var(--ion-color-secondary-shade);
     border-color: var(--ion-color-secondary-shade);
     box-shadow: 0 0 0 0.2rem var(--ion-color-secondary-tint);
+  }
+  .btn.btn-dark{
+    border: 2px solid #111;
+    color: white;
+    background-color: #111;
   }
   .btn.btn-outline-dark{
     border: 2px solid #111;
