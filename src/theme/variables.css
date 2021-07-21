@@ -3,6 +3,7 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
+  --ion-text-color: #181818;
   /*--ion-background-color: #FFFFFF;*/
   --ion-font-family: 'Poppins', sans-serif;
   /** primary **/
@@ -85,6 +86,7 @@ http://ionicframework.com/docs/theming/ */
    */
 
   body {
+
     --ion-color-primary: #afccff;
     --ion-color-primary-rgb: 175, 204, 255;
     --ion-color-primary-contrast: #000000;
@@ -235,11 +237,4 @@ http://ionicframework.com/docs/theming/ */
 
     --ion-card-background: #1e1e1e;
   }
-}
-.toolbar-background{
-  --border-width: 3px;
-  --border-color: pink;
-}
-ion-toolbar {
-  --border-width: 3px;
 }

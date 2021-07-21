@@ -27,79 +27,110 @@
             </ion-toolbar>
         </ion-header>
         <ion-content>
-                <div class="estructuraFlex">
-                    <div class="cabeceraInt">
-                        <h1>Rooms</h1>
-                    </div>
-                    <div class="gridTarjetas" v-if="roomList.length >= 0"><!--change to >0 !-->
-                        <div class="tarjeta">
-                            <h2><i class="far fa-microphone"></i><span>How do I apply UX Design process in product ✒️🎨💻</span></h2>
-                            <div class="cuerpo">
-                                <div>
-                                    <div class="fotos">
-                                        <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
-                                        <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
-                                    </div>
+            <div class="estructuraFlex">
+                <div class="cabeceraInt">
+                    <h1>Rooms</h1>
+                </div>
+                <div class="gridTarjetas" v-if="roomList.length >= 0">
+                    <!-- maquetación estática -->
+                    <!--<div class="tarjeta">
+                        <div class="titulo">
+                            <h2><i class="fas fa-microphone"></i><span>How do I apply UX Design process in product ✒️🎨💻</span></h2>
+                        </div>
+                        <div class="cuerpo">
+                            <div>
+                                <div class="fotos">
+                                    <img src="/assets/images/usuario-01.png" alt="speaker" class="normal" />
+                                    <img src="/assets/images/usuario-01.png" alt="speaker" class="superpuesta" />
                                 </div>
-                                <div>
-                                    <div class="usuarios">
-                                        <ul>
-                                            <li>Ariel Brailovsky</li>
-                                            <li>Ariel Brailovsky</li>
-                                            <li>Ariel Brailovsky</li>
-                                        </ul>
-                                    </div>
-                                    <div class="badges">
+                            </div>
+                            <div>
+                                <div class="usuarios">
+                                    <ul>
+                                        <li>Ariel Brailovsky</li>
+                                        <li>Ariel Brailovsky</li>
+                                        <li>Ariel Brailovsky</li>
+                                    </ul>
+                                </div>
+                                <div class="badges">
+                                    <div>
                                         <div>
                                             <p>4</p>
                                             <img src="/assets/images/ico-speaker-morado.svg" alt="speaker" />
                                         </div>
                                     </div>
+                                    <div>
+                                        <div>
+                                            <p>4</p>
+                                            <img src="/assets/images/ico-chat-morado.svg" alt="chat" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <!--dynamic list !-->
-                        <div class="tarjeta" v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
-                             <h2><i class="far" v-bind:class="roomItem.onlySound ? 'fa-microphone' : 'fa-camera'"></i><span>{{roomItem.name}}</span></h2>
-                             <div class="cuerpo">
-                                 <div>
-                                     <div class="fotos">
-                                         <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
-                                         <img src="/assets/images/usuario-01.png" alt="speaker" class="persona persona1" />
-                                     </div>
-                                 </div>
-                                 <div>
-                                     <div class="usuarios">
-                                         <ul>
-                                             <li v-for="member in roomItem.speakers.splice(0,4)" :key="member.id">{{member.user}}</li>
-                                         </ul>
-                                     </div>
-                                     <div class="badges">
-                                         <div>
-                                             <p>{{roomItem.speakers.length}}</p>
-                                             <img src="/assets/images/ico-speaker-morado.svg" alt="speaker" />
-                                             <p>{{roomItem.members.length}}</p>
-                                             <img src="/assets/images/ico-speaker-morado.svg" alt="audience" />
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                         </div>
-                    </div>
-                    <div class="central" v-if="roomList.length == 0">
-                        <div class="icono">
-                            <img src="/assets/images/ico-podcast.svg" alt="podcast" />
+                    </div>-->
+                    
+                    <!--dynamic list -->
+                    <div class="tarjeta" v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
+                        <div class="titulo">
+                            <h2>
+                                <i class="fas" v-bind:class="roomItem.onlySound ? 'fa-microphone' : 'fa-video'"></i>
+                                <span>{{roomItem.name}}</span>
+                            </h2>
                         </div>
-                        <h2>Hi {{loginData.user}}!</h2>
-                        <p>It seems that there are no open rooms</p>
-                        <p>
-                            <button class="botonLink" @click="openRoomModal()">Create a new room here<i class="fas fa-arrow-right"></i></button>
-                        </p>
+                         
+                        <div class="cuerpo">
+                            <div>
+                                <div class="fotos" v-if="roomItem.onlySound">
+                                    <img src="/assets/images/usuario-01.png" alt="speaker" class="normal" />
+                                    <img src="/assets/images/usuario-01.png" alt="speaker" class="superpuesta" />
+                                </div>
+                                <div class="videos" v-if="roomItem.onlySound == false">
+                                    <div>
+                                        <img src="/assets/images/ejemplo-video.png" alt="thumbnail video" class="normal" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="usuarios">
+                                    <ul>
+                                        <li v-for="member in roomItem.speakers.splice(0,4)" :key="member.id">{{member.user}}</li>
+                                    </ul>
+                                </div>
+                                <div class="badges">
+                                    <div>
+                                        <div>
+                                            <p>{{roomItem.speakers.length}}</p>
+                                            <img src="/assets/images/ico-speaker-morado.svg" alt="speakers" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <p>{{roomItem.members.length}}</p>
+                                            <img src="/assets/images/ico-chat-morado.svg" alt="members" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-center">
-                        <button class="btn btn-primary" @click="openRoomModal()"><i class="fal fa-plus marginright"></i>Create room</button>
-                    </div>
+                    <!--fin dynamic list -->
                 </div>
+                <!-- Cuando no hay salas -->
+                <div class="central" v-if="roomList.length == 0">
+                    <div class="icono">
+                        <img src="/assets/images/ico-podcast.svg" alt="podcast" />
+                    </div>
+                    <h2>Hi {{loginData.user}}!</h2>
+                    <p>It seems that there are no open rooms</p>
+                    <p>
+                        <button class="botonLink" @click="openRoomModal()">Create a new room here<i class="fas fa-arrow-right"></i></button>
+                    </p>
+                </div>
+                <div class="btnFixed">
+                    <button class="btn btn-primary" @click="openRoomModal()"><i class="fal fa-plus marginright"></i>Create room</button>
+                </div>
+            </div>
             <div class="trianguloAbsolute">
                 <img src="/assets/images/triangle.svg" alt="triangle" />
             </div>

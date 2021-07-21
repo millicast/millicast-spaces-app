@@ -17,6 +17,7 @@ ion-app, #dvSplashPWA{
 
 h1, h2, h3, h4, h5, h6{
   margin-top: 0 !important;
+  color: #181818;
 }
 p{
   margin-top: 0;
@@ -292,15 +293,18 @@ ion-app {
   }
 }
 .cabeceraInt{
+  margin-bottom: 20px;
   h1{
     font-size: 24px;
     font-weight: bold;
     color: #181818;
+    margin-bottom: 0;
   }
   h2{
     font-size: 18px;
     font-weight: 600;
     color: #181818;
+    margin-bottom: 0;
   }
 }
 .cabeceraInt.flex{
@@ -349,4 +353,12 @@ ion-app {
   .col-md-4{
     flex-basis: 30%;
   }
+}
+
+.btnFixed{
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
