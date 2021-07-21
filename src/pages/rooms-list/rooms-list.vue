@@ -94,7 +94,7 @@
                             <div>
                                 <div class="usuarios">
                                     <ul>
-                                        <li v-for="member in roomItem.speakers.splice(0,4)" :key="member.id">{{member.user}}</li>
+                                        <li v-for="member in roomItem.speakers.slice(0, 4)" :key="member.id">{{member.user}}</li>
                                     </ul>
                                 </div>
                                 <div class="badges">
