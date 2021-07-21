@@ -138,41 +138,28 @@
             }
         }
     }
-    
-    .hablando .foto .marco{
-        border: 2px solid #00DC84;
-    }
-    .hablando .foto .marco{
-        animation: pulse-green 1s infinite;
-    }
-    .hablando .foto img{
-        border: 2px solid white;
-    }
-    .hablando .circulo {
+    .circulo {
         background: #00DC84;
         box-shadow: 0 0 0 0 #00DC84;
         color: white;
     }
-    .hablando .circulo {
-        animation: zoom 1s infinite;
-    }
     .multiplexed .foto .marco{
-        border: 2px solid var(--ion-color-primary);
+        border: 2px solid #00DC84;
     }
-    .multiplexed .foto .marco{
-        animation: pulse-morado 1s infinite;
+    .hablando .foto .marco{
+        animation: pulse-green 0.8s infinite;
     }
     .multiplexed .foto img{
         border: 2px solid white;
     }
     .multiplexed .circulo {
-        background: var(--ion-color-primary);
-        box-shadow: 0 0 0 0 var(--ion-color-primary);
+        background: #00DC84;
+        box-shadow: 0 0 0 0 #00DC84;
         color: white;
     }
-    .multiplexed .circulo {
-        animation: zoom 1s infinite;
-    } 
+    .hablando .circulo {
+        animation: zoom 1.6s infinite;
+    }
     .muteado .circulo {
         background: white;
         box-shadow: none;
@@ -181,6 +168,12 @@
     }
     .muteado .foto .marco{
         border: 2px solid white;
+    }
+
+    .raised-hand .circulo {
+        background: #FFA500;
+        box-shadow: 0 0 0 0 #FFA500;
+        color: white;
     }
        
     
