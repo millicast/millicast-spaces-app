@@ -52,6 +52,12 @@ export default class SocketModel {
                 SocketModel.callbackUserDemoted(roomId);
             }
         })
+
+        SocketModel.io.on('disconnect', function () {
+            if (SocketModel.callbackDisconnected != null) {
+                SocketModel.callbackDisconnected();
+            }
+        });
     }
 
     //#region LOGIN
@@ -175,6 +181,7 @@ export default class SocketModel {
     public static callbackUpdateRequestsModal: (room: RoomModel) => void
     public static callbackUserPromoted: (roomId: string, tokens: TokenModel) => void
     public static callbackUserDemoted: (roomId: string) => void
+    public static callbackDisconnected: () => void
 
     //#endregion
 

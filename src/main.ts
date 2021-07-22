@@ -34,6 +34,11 @@ const app = createApp(App)
 app.config.globalProperties.$loginData = new LoginModel();
 SocketModel.initialize()
 
+SocketModel.callbackDisconnected = () => {
+    app.config.globalProperties.$loginData = new LoginModel();
+    router.push({path:"/"})
+}
+
 router.isReady().then(() => {
   app.mount('#app');
   router.replace("/")
