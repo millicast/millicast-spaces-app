@@ -30,17 +30,17 @@ export default defineComponent({
         }
     },
     computed: {
-        audioOnlySpeakers : function() {
-            return this.room.onlySound ?   this.room.speakers : this.room.speakers.filter(m => m.id!=this.room.OwnerId);
+        audioOnlySpeakers: function () {
+            return this.room.onlySound ? this.room.speakers : this.room.speakers.filter(m => m.id != this.room.OwnerId);
         },
-        owner : function() {
-            return this.room.speakers.find(m => m.id==this.room.OwnerId);
+        owner: function () {
+            return this.room.speakers.find(m => m.id == this.room.OwnerId);
         }
     },
     methods: {
         async init() {
             const cntViewerTags = document.getElementById("cntViewerTags")
-            while (cntViewerTags.firstChild) 
+            while (cntViewerTags.firstChild)
                 cntViewerTags.removeChild(cntViewerTags.firstChild);
 
             const route = useRoute();
@@ -49,7 +49,7 @@ export default defineComponent({
             //Read current user from global state
             const user = this.$loginData;
             //Join room and retrieve publisher and viewer stats
-            const {tokens , room} = await SocketModel.JoinRoom(roomId);
+            const { tokens, room } = await SocketModel.JoinRoom(roomId);
 
             await Promise.all([
                 this.loadRoomUser(user),
@@ -64,7 +64,7 @@ export default defineComponent({
                 this.viewer.stop(),
                 this.stopPublisher()
             ]);
-          
+
         },
         async assignSockets() {
 
@@ -97,7 +97,7 @@ export default defineComponent({
             };
 
         },
-        async stopPublisher(){
+        async stopPublisher() {
             //If not publishing already
             if (!this.publishing)
                 //Do nothing
@@ -116,7 +116,7 @@ export default defineComponent({
             this.publisher = null;
             //Stop stats interval
             clearInterval(this.publishingStats);
-	    },
+        },
         async preparePublisher(usr: LoginModel, tokens: TokenModel, room: RoomModel) {
 
             //Get user id
@@ -125,7 +125,7 @@ export default defineComponent({
             if (tokens.publisherToken != null && this.publisher == null) {
                 this.publisher = new Publish(room.Id, () => { return tokens.publisherToken });
                 //We only capture video on video rooms and for the owner
-                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true , video: !room.onlySound && room.OwnerId==sourceId});
+                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !room.onlySound && room.OwnerId == sourceId });
                 //Not muted
                 this.muted = false;
                 //Show local video
@@ -145,12 +145,12 @@ export default defineComponent({
                 }
                 this.publishing = true;
                 await this.publisher.connect({
-                    mediaStream : this.mediaStream,
-                    sourceId : sourceId,
+                    mediaStream: this.mediaStream,
+                    sourceId: sourceId,
                     disableVideo: room.onlySound,
                     dtx: true,
                     peerConfig: {
-                        iceServers : []
+                        iceServers: []
                     }
                 })
                 //Get pc
@@ -162,9 +162,14 @@ export default defineComponent({
                         //Find the audio stat
                         if (stat.kind == "audio" && stat.type == "media-source") {
                             //Find us
-                            const us = this.room.speakers.find(s=>s.id==this.loginData.id);
+                            const us = this.room.speakers.find(s => s.id == this.loginData.id);
                             //Set our audio level
                             us.audioLevel = stat.audioLevel;
+                            if (us != undefined && stat.audioLevel > 0.001) {
+                                const usrImg: any = document.querySelector(`[data-speakerid="${us.id}"]`);
+                                const brightness = ((100 * stat.audioLevel * 19 / 100) + 24);
+                                usrImg.style.setProperty('--luminosidad',  brightness + '%');
+                            }
                             //Done
                             return;
                         }
@@ -185,8 +190,7 @@ export default defineComponent({
                 //Get stream
                 let stream = event.streams[0];
                 //If it is main video
-                if (stream.getVideoTracks().length)
-                {
+                if (stream.getVideoTracks().length) {
                     //Get video element
                     const element = document.querySelector(".mainVideo video") as HTMLVideoElement;
                     //Do not duplicate
@@ -263,30 +267,30 @@ export default defineComponent({
                         const oldSpeaker = this.room.speakers.find(s => s.multiplexedId = data.mediaId);
                         //If there was a previous speaker in that multiplexed id
                         if (oldSpeaker) {
-                                //Not multiplexed anymore
-                                oldSpeaker.multiplexedId = null;
-                                oldSpeaker.audioLevel = 0;
+                            //Not multiplexed anymore
+                            oldSpeaker.multiplexedId = null;
+                            oldSpeaker.audioLevel = 0;
                         }
                         //Find new speaker
                         const speaker = this.room.speakers.find(s => s.id == data.sourceId);
                         //If got it
                         if (speaker) {
-                                //Assing multiplexing id
-                                speaker.multiplexedId = data.mediaId;
-                                speaker.audioLevel = 0;
+                            //Assing multiplexing id
+                            speaker.multiplexedId = data.mediaId;
+                            speaker.audioLevel = 0;
                         }
 
                 }
             });
 
             await this.viewer.connect({
-                pinnedSourceId: room.OwnerId!=sourceId ? room.OwnerId : null,
+                pinnedSourceId: room.OwnerId != sourceId ? room.OwnerId : null,
                 multiplexedAudioTracks: 3,
                 excludedSourceIds: [sourceId],
-                disableVideo: room.onlySound || room.OwnerId==sourceId,
+                disableVideo: room.onlySound || room.OwnerId == sourceId,
                 dtx: true,
                 peerConfig: {
-                    iceServers : []
+                    iceServers: []
                 }
             });
             //Get pc
@@ -294,9 +298,9 @@ export default defineComponent({
             //Get stats periodically
             setInterval(async () => {
                 //IF we are not the owners
-                if (this.loginData.id!=this.room.OwnerId) {
+                if (this.loginData.id != this.room.OwnerId) {
                     //Get first audio transceiver
-                    const mainAudio = pc.getTransceivers().filter(t=>t.receiver.track.kind=="audio")[0];
+                    const mainAudio = pc.getTransceivers().filter(t => t.receiver.track.kind == "audio")[0];
                     //Find ownser
                     const owner = this.room.speakers.find(s => s.id == this.room.OwnerId);
                     //Set mid
@@ -334,7 +338,7 @@ export default defineComponent({
                         }
                     }
                 }
-                
+
             }, 100);
 
         },
@@ -388,8 +392,8 @@ export default defineComponent({
             let currRoom: RoomModel = this.room;
             await SocketModel.ManageRequest(currRoom.Id, usrId, promote)
         },
-        toggleMute() {  
-            const audioTrack =  this.mediaStream.getAudioTracks()[0];
+        toggleMute() {
+            const audioTrack = this.mediaStream.getAudioTracks()[0];
             audioTrack.enabled = !audioTrack.enabled;
             this.muted = !audioTrack.enabled;
         }
@@ -400,5 +404,5 @@ export default defineComponent({
     unmounted() {
         console.log("desmontado")
         this.close();
-    },     
+    },
 })
