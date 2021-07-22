@@ -294,7 +294,7 @@ export default defineComponent({
             //Get stats periodically
             setInterval(async () => {
                 //IF we are not the owners
-                if (this.loginData.id != this.room.OwnerId) {
+                if (this.loginData.id != undefined && this.loginData.id != this.room.OwnerId) {
                     //Get first audio transceiver
                     const mainAudio = pc.getTransceivers().filter(t => t.receiver.track.kind == "audio")[0];
                     //Find ownser

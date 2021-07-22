@@ -45,92 +45,74 @@
                         <h3>Speakers <span>({{room.speakers.length}})</span></h3>
                     </div>
                 </div>
+
+                <!-- Toasts -->
+                <!--<div class="toast success">
+                    <div class="icono">
+                        <i class="fal fa-hand-paper"></i>
+                    </div>
+                    <div>
+                        <p>You have been moved to the group of speakers. Now you can speak.</p>
+                    </div>
+                    <div class="close">
+                        <i class="fal fa-times"></i>
+                    </div>
+                </div>-->
+                <!--<div class="toast warning">
+                    <div class="icono">
+                        <i class="fal fa-hand-paper"></i>
+                    </div>
+                    <div>
+                        <p>You have been moved to the group of speakers. Now you can speak.</p>
+                    </div>
+                    <div class="close">
+                        <i class="fal fa-times"></i>
+                    </div>
+                </div>-->
+                <!--<div class="toast error">
+                    <div class="icono">
+                        <i class="fal fa-hand-paper"></i>
+                    </div>
+                    <div>
+                        <p>You have been moved to the group of speakers. Now you can speak.</p>
+                    </div>
+                    <div class="close">
+                        <i class="fal fa-times"></i>
+                    </div>
+                </div>-->
+                <!-- Toasts -->
+
                 <div class="gridUsers">
-                  <div v-if="!room.onlySound" class="mainVideo">
-                    <video></video>
-                    <h4 v-if="owner">{{owner.user}}</h4>
-                  </div>
-                  <div v-for="speaker in audioOnlySpeakers" :key="speaker.id" v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==loginData.id ||  speaker.id==room.OwnerId,'hablando' : speaker.audioLevel>0.001,'muteado'  : speaker.muted}">
-                    <div>
-                      <div class="foto">
-                        <div class="marco">
-                          <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
+                    <div v-if="!room.onlySound" class="mainVideo multiplexed">
+                        <div>
+                            <div class="foto">
+                                <div class="marco">
+                                    <video></video>
+                                </div>
+                                <div class="circulo">
+                                    <i class="far fa-microphone"></i>
+                                </div>
+                            </div>
+                            <h4 v-if="owner">{{owner.user}}</h4>
                         </div>
-                        <div class="circulo">
-                          <i class="far fa-microphone"></i>
-                        </div>
-                      </div>
-                      <h4>{{speaker.user}}</h4>
-                      <span v-if="loginData.id == room.OwnerId && speaker.id != room.OwnerId">
-                        <span @click="manageRequest(speaker.id, false)">Demote</span>
-                      </span>
                     </div>
-                  </div>
-                  <!--<div class="multiplexed hablando">
-                    <div>
-                      <div class="foto">
-                        <div class="marco">
-                          <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
+
+                    <div v-for="speaker in audioOnlySpeakers" :key="speaker.id" v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==loginData.id ||  speaker.id==room.OwnerId,'hablando' : speaker.audioLevel>0.001,'muteado'  : speaker.muted}">
+                        <div>
+                        <div class="foto" :data-speakerid="speaker.id">
+                            <div class="marco">
+                                <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
+                            </div>
+                            <div class="circulo">
+                                <i class="far fa-microphone"></i>
+                            </div>
                         </div>
-                        <div class="circulo">
-                          <i class="far fa-microphone"></i>
+                        <h4>{{speaker.user}}</h4>
+                        <span v-if="loginData.id == room.OwnerId && speaker.id != room.OwnerId">
+                            <span @click="manageRequest(speaker.id, false)">Demote</span>
+                        </span>
                         </div>
-                      </div>
-                      <h4>multiplexed Hablando</h4>
                     </div>
-                  </div>
-                  <div class="multiplexed">
-                    <div>
-                      <div class="foto">
-                        <div class="marco">
-                          <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                        </div>
-                        <div class="circulo">
-                          <i class="far fa-microphone"></i>
-                        </div>
-                      </div>
-                      <h4>Hablando</h4>
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <div class="foto">
-                        <div class="marco">
-                          <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                        </div>
-                        <div class="circulo">
-                          <i class="far fa-microphone"></i>
-                        </div>
-                      </div>
-                      <h4>Normal</h4>
-                    </div>
-                  </div>
-                  <div class="muteado">
-                    <div>
-                      <div class="foto">
-                        <div class="marco">
-                          <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                        </div>
-                        <div class="circulo">
-                          <i class="far fa-microphone-alt-slash"></i>
-                        </div>
-                      </div>
-                      <h4>Usuario muteado</h4>
-                    </div>
-                  </div>-->
-                  <!--<div class="hablando porEncima">
-                  <div>
-                      <div class="foto">
-                          <div class="marco">
-                              <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                          </div>
-                          <div class="circulo">
-                              <i class="far fa-microphone"></i>
-                          </div>
-                      </div>
-                      <h4>Bea</h4>
-                  </div>
-              </div>-->
                 </div>
                 <div class="titular mt20 mb20">
                      <div>
@@ -162,57 +144,6 @@
 -->
                          </div>
                     </div>
-<!--
-                    <div>
-                        <div>
-                            <div class="foto">
-                                <div class="marco">
-                                    <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                                </div>
-                              
-                            </div>
-                            <h4>Mano levantada</h4>
-                        </div>
-                    </div>
-                    <div class="raised-hand">
-                        <div>
-                            <div class="foto">
-                                <div class="marco">
-                                    <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                                </div>
-                                <div class="circulo">
-                                    <i class="far fa-hand-paper"></i>
-                                </div>
-                            </div>
-                            <h4>Mano levantada</h4>
-                        </div>
-                    </div>
-                    <div class="raised-hand">
-                        <div>
-                            <div class="foto">
-                                <div class="marco">
-                                    <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                                </div>
-                                <div class="circulo">
-                                    <i class="far fa-hand-paper"></i>
-                                </div>
-                            </div>
-                            <h4>Mano levantada</h4>
-                        </div>
-                    </div>
-                    <div class="raised-hand">
-                        <div>
-                            <div class="foto">
-                                <div class="marco">
-                                    <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
-                                </div>
-                                <div class="circulo">
-                                    <i class="far fa-hand-paper"></i>
-                                </div>
-                            </div>
-                            <h4>Mano levantada</h4>
-                        </div>
-                    </div>-->
                 </div>
             </div>
             <div id="cntViewerTags" style="display:none">

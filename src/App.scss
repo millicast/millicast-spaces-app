@@ -378,3 +378,38 @@ ion-app {
   right: 0;
   text-align: center;
 }
+.toast{
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  padding: 20px;
+  display: flex;
+  .icono{
+    margin-right: 12px;
+    margin-top: 4px;
+  }
+  .close{
+    margin-left: 12px;
+    margin-top: 4px;
+  }
+  i{
+    font-size: 23px;
+  }
+  p{
+    margin: 0;
+    font-size: 14px;
+  }
+  &.success{
+    background-color: #00DC84;
+    color: white;
+  }
+  &.warning{
+    background-color: #f39c12;
+    color: white;
+  }
+  &.error{
+    background-color: #e74c3c;
+    color: white;
+  }
+}
