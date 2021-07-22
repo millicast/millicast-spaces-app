@@ -26,7 +26,7 @@
         </ion-header>
         <ion-content>
             <div class="estructuraFlex saveFaldon">
-                <div class="cabeceraInt flex">
+                <div class="cabeceraInt flex" v-if="room">
                     <div>
                         <h2>{{room.name}}</h2>
                     </div>
@@ -83,23 +83,26 @@
                 <!-- Toasts -->
 
                 <div class="gridUsers">
-                    <div v-if="!room.onlySound" class="mainVideo multiplexed">
+                    <div v-if="!room.onlySound && owner" class="mainVideo">
                         <div>
                             <div class="foto">
                                 <div class="marco">
                                     <video></video>
                                 </div>
-                                <div class="circulo">
+                                <!--<div class="circulo">
                                     <i class="far fa-microphone"></i>
-                                </div>
+                                </div>-->
                             </div>
                             <h4 v-if="owner">{{owner.user}}</h4>
                         </div>
                     </div>
 
-                    <div v-for="speaker in audioOnlySpeakers" :key="speaker.id" v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==loginData.id ||  speaker.id==room.OwnerId,'hablando' : speaker.audioLevel>0.001,'muteado'  : speaker.muted}">
+                    <div v-for="speaker in audioOnlySpeakers" :key="speaker.id" 
+                        v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==loginData.id ||  speaker.id==room.OwnerId,'hablando' : speaker.audioLevel>0.01,'muteado'  : speaker.muted}"
+                        v-bind:style="{'--audio-level': speaker.audioLevel>0.01 ? speaker.audioLevel : 0}"
+                    >
                         <div>
-                        <div class="foto" :data-speakerid="speaker.id">
+                        <div class="foto" :data-speakerid="speaker.id" v-bind:style="{'--luminosidad': (speaker.audioLevel>0.01 ? (50 - 50 * speaker.audioLevel ) : 50)+'%'}">
                             <div class="marco">
                                 <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
                             </div>
@@ -150,7 +153,7 @@
             </div>
             <div class="faldonFooter">
                 <div>
-                    <button class="btn btn-dark"><i class="far fa-sign-out marginright"></i>Leave room</button>
+                    <button class="btn btn-dark" @click="$router.back()"><i class="far fa-sign-out marginright"></i>Leave room</button>
                 </div>
                 <div v-if="loginData.id == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
                     <button class="btn btn-default btn-redondeado" @click="openRequestModal()">

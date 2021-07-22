@@ -150,6 +150,7 @@
     .hablando .foto .marco{
         border: 2px solid hsl(156deg 100% var(--luminosidad));
         animation: pulse-green 0.8s infinite;
+        animation-timing-function: ease-out;
     }
     .multiplexed .foto img{
         border: 2px solid white;
@@ -160,8 +161,9 @@
         color: white;
     }
     .hablando .circulo {
-        animation: zoom 1.6s infinite;
-        background: hsl(156deg 100% var(--luminosidad));
+        animation: zoom 0.8s infinite;
+        animation-timing-function: ease-out;
+        background: #00DC84;
         color: white;
     }
     .muteado .circulo {

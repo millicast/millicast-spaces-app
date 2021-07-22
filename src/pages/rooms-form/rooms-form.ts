@@ -6,7 +6,7 @@ import { defineComponent } from 'vue';
 import LoginModel from '../../models/login/LoginModel';
 import TokenModel from '../../models/common/TokenModel';
 import RoomModel from '@/models/rooms/RoomModel';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import SocketModel from '../../models/socket/socket';
 import requestsModal from '../requests-modal/requests-modal.vue';
 import { Director, Publish, View, Logger } from '@millicast/sdk'
@@ -61,7 +61,7 @@ export default defineComponent({
         },
         async close() {
             await Promise.all([
-                this.viewer.stop(),
+                this.stopViewer(),
                 this.stopPublisher()
             ]);
 
@@ -97,6 +97,14 @@ export default defineComponent({
             };
 
         },
+        async stopViewer() {
+            //Stop stats interval
+            clearInterval(this.viewingStats);
+            //Stop viewer
+            await this.viewer.stop();
+            //Done
+            this.viewer = null;
+        },
         async stopPublisher() {
             //If not publishing already
             if (!this.publishing)
@@ -110,6 +118,8 @@ export default defineComponent({
             }
             //Not publishing anymore
             this.publishing = false;
+            //Stop stats interval
+            clearInterval(this.publishingStats);
             //Stop publishing
             await this.publisher.stop();
             //Done
@@ -165,7 +175,6 @@ export default defineComponent({
                             const us = this.room.speakers.find(s => s.id == this.loginData.id);
                             //Set our audio level
                             us.audioLevel = stat.audioLevel;
-                            this.brightnessControl(us, stat.audioLevel);
                             //Done
                             return;
                         }
@@ -292,7 +301,7 @@ export default defineComponent({
             //Get pc
             const pc = await this.viewer.getRTCPeerConnection();
             //Get stats periodically
-            setInterval(async () => {
+            this.viewingStats = setInterval(async () => {
                 //IF we are not the owners
                 if (this.loginData.id != undefined && this.loginData.id != this.room.OwnerId) {
                     //Get first audio transceiver
@@ -330,7 +339,6 @@ export default defineComponent({
                             //If got it
                             if (speaker) {
                                 speaker.audioLevel = stat.audioLevel;
-                                this.brightnessControl(speaker, stat.audioLevel);
                             }
                         }
                     }
@@ -338,13 +346,6 @@ export default defineComponent({
 
             }, 100);
 
-        },
-        brightnessControl(speaker: any, audioLevel: number) {
-            if (speaker != undefined && audioLevel > 0.001) {
-                const usrImg: any = document.querySelector(`[data-speakerid="${speaker.id}"]`);
-                const brightness = ((100 * audioLevel * 19 / 100) + 24);
-                usrImg.style.setProperty('--luminosidad', brightness + '%');
-            }
         },
         loadRoom(room: RoomModel) {
             this.room = room;
@@ -400,7 +401,7 @@ export default defineComponent({
             const audioTrack = this.mediaStream.getAudioTracks()[0];
             audioTrack.enabled = !audioTrack.enabled;
             this.muted = !audioTrack.enabled;
-        }
+        },
     },
     mounted() {
         this.init();
