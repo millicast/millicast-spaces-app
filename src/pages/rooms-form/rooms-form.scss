@@ -136,17 +136,19 @@
                 border-radius: 50%;
                 border: 1px solid transparent;
             }
+            --luminosidad: 43%;
         }
     }
     .circulo {
-        background: #00DC84;
-        box-shadow: 0 0 0 0 #00DC84;
-        color: white;
+        /*background: #00DC84;
+        box-shadow: 0 0 0 0 #00DC84;*/
+        
     }
     .multiplexed .foto .marco{
         border: 2px solid #00DC84;
     }
     .hablando .foto .marco{
+        border: 2px solid hsl(156deg 100% var(--luminosidad));
         animation: pulse-green 0.8s infinite;
     }
     .multiplexed .foto img{
@@ -159,6 +161,8 @@
     }
     .hablando .circulo {
         animation: zoom 1.6s infinite;
+        background: hsl(156deg 100% var(--luminosidad));
+        color: white;
     }
     .muteado .circulo {
         background: white;
@@ -180,7 +184,7 @@
     @keyframes pulse-green {
         0% {
             /*transform: scale(0.95);*/
-            box-shadow: 0 0 0 0 rgba(51, 217, 178, 0.7);
+            box-shadow: 0 0 0 0 hsla(156deg, 100%, var(--luminosidad), 0.7);
         }
         
         70% {

@@ -244,10 +244,7 @@
             <div class="trianguloAbsolute">
                 <img src="/assets/images/triangle.svg" alt="triangle" />
             </div>
-        </ion-content>   
-        <ion-footer>
-        </ion-footer>
-
+        </ion-content>
     </ion-page>
 </template>
 <script src="./rooms-form.ts" lang="ts"></script>
