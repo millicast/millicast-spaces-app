@@ -165,11 +165,7 @@ export default defineComponent({
                             const us = this.room.speakers.find(s => s.id == this.loginData.id);
                             //Set our audio level
                             us.audioLevel = stat.audioLevel;
-                            if (us != undefined && stat.audioLevel > 0.001) {
-                                const usrImg: any = document.querySelector(`[data-speakerid="${us.id}"]`);
-                                const brightness = ((100 * stat.audioLevel * 19 / 100) + 24);
-                                usrImg.style.setProperty('--luminosidad',  brightness + '%');
-                            }
+                            this.brightnessControl(us, stat.audioLevel);
                             //Done
                             return;
                         }
@@ -334,6 +330,7 @@ export default defineComponent({
                             //If got it
                             if (speaker) {
                                 speaker.audioLevel = stat.audioLevel;
+                                this.brightnessControl(speaker, stat.audioLevel);
                             }
                         }
                     }
@@ -341,6 +338,13 @@ export default defineComponent({
 
             }, 100);
 
+        },
+        brightnessControl(speaker: any, audioLevel: number) {
+            if (speaker != undefined && audioLevel > 0.001) {
+                const usrImg: any = document.querySelector(`[data-speakerid="${speaker.id}"]`);
+                const brightness = ((100 * audioLevel * 19 / 100) + 24);
+                usrImg.style.setProperty('--luminosidad', brightness + '%');
+            }
         },
         loadRoom(room: RoomModel) {
             this.room = room;
