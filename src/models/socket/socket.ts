@@ -5,8 +5,7 @@ import ResultModel from '../common/ResultModel';
 import RoomModel from '../rooms/RoomModel';
 import TokenModel from '../common/TokenModel';
 
-class JoinModel
-{
+class JoinModel {
     tokens: TokenModel
     room: RoomModel
 }
@@ -29,15 +28,9 @@ export default class SocketModel {
             }
         })
 
-        SocketModel.io.on("room-requests-list", (room: RoomModel) => {
+        SocketModel.io.on("room-requests-list", (room: RoomModel, pendingRequestUser: LoginModel) => {
             if (SocketModel.callbackUpdateRoomRequests != null) {
-                SocketModel.callbackUpdateRoomRequests(room)
-            }
-        })
-
-        SocketModel.io.on("room-requests-modal", (room: RoomModel) => {
-            if (SocketModel.callbackUpdateRequestsModal != null) {
-                SocketModel.callbackUpdateRequestsModal(room)
+                SocketModel.callbackUpdateRoomRequests(room, pendingRequestUser)
             }
         })
 
@@ -177,8 +170,7 @@ export default class SocketModel {
 
     public static callbackUpdateRooms: (roomsList: RoomModel[]) => void
     public static callbackUpdateRoom: (room: RoomModel) => void
-    public static callbackUpdateRoomRequests: (room: RoomModel) => void
-    public static callbackUpdateRequestsModal: (room: RoomModel) => void
+    public static callbackUpdateRoomRequests: (room: RoomModel, pendingRequestUser: LoginModel) => void
     public static callbackUserPromoted: (roomId: string, tokens: TokenModel) => void
     public static callbackUserDemoted: (roomId: string) => void
     public static callbackDisconnected: () => void

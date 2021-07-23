@@ -28,33 +28,34 @@
 
             <!-- Toasts -->
             <!-- Añadir slideDown para hacer aparecer -->
-            <div class="toast success">
+            <div v-bind:class="{'toast': true, 'success': true, 'slideDown': showMsgWindow}">
                 <div class="sup">
                     <div class="icono">
                         <i class="fal fa-hand-paper"></i>
                     </div>
                     <div>
-                        <p>You have been moved to the group of speakers. Now you can speak.</p>
+                        <p>The user {{LastPendingRequestUser.user}} has made a request.</p>
+                        <!--<p>You have been moved to the group of speakers. Now you can speak.</p>-->
                     </div>
-                    <div class="close">
+                    <div class="close" @click="closeMsgWindow();">
                         <i class="fal fa-times"></i>
                     </div>
                 </div>
                 <div class="action">
                     <div>
-                        <button class="btn btn-translucent">Deny</button>
+                        <button class="btn btn-translucent" @click="manageRequest(LastPendingRequestUser.id, false)">Deny</button>
                     </div>
                     <div>
-                        <button class="btn btn-light">Allow to speak</button>
+                        <button class="btn btn-light" @click="manageRequest(LastPendingRequestUser.id, true)">Allow to speak</button>
                     </div>
                 </div>
             </div>
             <!-- Toasts -->
 
             <!-- Modales manuales-->
-            <!--<div class="modalManual">
+            <div class="modalManual" v-bind:class="{'modalManual': true, 'hidden': !showManageUserWindow}">
                 <div class="cuerpo">
-                    <button class="icoClose"><i class="far fa-times"></i></button>
+                    <button class="icoClose" @click="showManageUserWindow = false;"><i class="far fa-times"></i></button>
                     <div class="cabeceraConFoto">
                         <div class="foto">
                             <img src="/assets/images/usuario-01.png" alt="ejemplo" />
@@ -63,22 +64,23 @@
                              </div>
                         </div>
                         <div class="texto">
-                            <h2>@SmaliBrailovski</h2>
+                            <h2>@{{SelectedUser.user}}</h2>
                         </div>
                     </div>
                     <div class="action text-center">
                         <div>
-                            <button class="btn btn-secondary">Move to speakers</button>
+                            <button class="btn btn-secondary" v-if="room.members != undefined && room.members.filter(f => f.id == SelectedUser.id).length > 0" @click="manageRequest(SelectedUser.id, true)">Move to speakers</button>
+                            <button class="btn btn-secondary" v-if="room.speakers != undefined && room.speakers.filter(f => f.id == SelectedUser.id).length > 0" @click="manageRequest(SelectedUser.id, false)">Move to viewers</button>
                         </div>
                         <div class="mt10">
                             <button class="btn btn-default">Eject of the room</button>
                         </div>
                     </div>
                 </div>
-            </div>-->
-            <!--<div class="modalManual">
+            </div>
+            <div v-bind:class="{'modalManual': true, 'hidden': !showPendingRequestsList}">
                 <div class="cuerpo">
-                    <button class="icoClose" @click="closeRequestModal()"><i class="far fa-times"></i></button>
+                    <button class="icoClose" @click="showPendingRequestsList = false;"><i class="far fa-times"></i></button>
                     <div class="cabecera">
                         <div class="icono">
                             <img src="/assets/images/ico-mano-alzada.svg" alt="mano-alzada" />
@@ -89,7 +91,7 @@
                         </div>
                     </div>
                     <div class="action">
-                        <div>
+                        <div v-if="room.members != undefined && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length == 0">
                             <p>No one has raised their hand yet!</p>    
                         </div>
                         <div class="gridInvitaciones">
@@ -114,7 +116,7 @@
                         </div>
                     </div>
                 </div>
-            </div>-->
+            </div>
             <!-- Modales manuales-->
 
             <div class="estructuraFlex saveFaldon">
@@ -158,6 +160,7 @@
                     <div v-for="speaker in audioOnlySpeakers" :key="speaker.id" 
                         v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==loginData.id ||  speaker.id==room.OwnerId,'hablando' : speaker.audioLevel>0.01,'muteado'  : speaker.muted}"
                         v-bind:style="{'--audio-level': speaker.audioLevel>0.01 ? speaker.audioLevel : 0}"
+                        @click="openUserWindow(speaker);"
                     >
                         <div>
                         <div class="foto" :data-speakerid="speaker.id" v-bind:style="{'--luminosidad': (speaker.audioLevel>0.01 ? (50 - 50 * speaker.audioLevel ) : 50)+'%'}">
@@ -184,7 +187,7 @@
                      </div>
                 </div>
                 <div class="gridUsers audience">
-                    <div v-for="member in room.members" :key="member.id" v-bind:class="{'raised-hand': member.pendingRequest}">
+                    <div v-for="member in room.members" :key="member.id" v-bind:class="{'raised-hand': member.pendingRequest}" @click="openUserWindow(member);">
                          <div>
                              <div class="foto" >
                                  <div class="marco">
@@ -195,14 +198,6 @@
                                  </div>
                              </div>
                              <h4>{{member.user}}</h4>
-<!--
-                             <span v-bind:class="{ 'pendingRequest': (member.pendingRequest != null && member.pendingRequest && (loginData.id == room.OwnerId || loginData.id == member.id)) }">
-                                 <span v-if="loginData.id == room.OwnerId">
-                                     <span @click="manageRequest(member.id, true)">Promote</span>
-                                     <span v-if="member.pendingRequest != null && member.pendingRequest" @click="manageRequest(member.id, false)">Refuse</span>
-                                 </span>
-                             </span>
--->
                          </div>
                     </div>
                 </div>
@@ -214,7 +209,7 @@
                     <button class="btn btn-dark" @click="$router.back()"><i class="far fa-sign-out marginright"></i>Leave room</button>
                 </div>
                 <div v-if="loginData.id == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
-                    <button class="btn btn-default btn-redondeado" @click="openRequestModal()">
+                    <button class="btn btn-default btn-redondeado" @click="showPendingRequestsList = true;">
                         <i class="far fa-handshake"></i>
                      </button>
                 </div>

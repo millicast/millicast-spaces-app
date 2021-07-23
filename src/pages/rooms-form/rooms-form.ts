@@ -26,7 +26,12 @@ export default defineComponent({
             viewer: null,
             publisher: null,
             publishing: false,
-            muted: false
+            muted: false,
+            showPendingRequestsList: false,
+            showManageUserWindow: false,
+            SelectedUser: new LoginModel(),
+            LastPendingRequestUser: new LoginModel(),
+            showMsgWindow: false
         }
     },
     computed: {
@@ -88,11 +93,13 @@ export default defineComponent({
                 }
             };
 
-            SocketModel.callbackUpdateRoomRequests = (room: RoomModel) => {
+            SocketModel.callbackUpdateRoomRequests = (room: RoomModel, pendingRequestUser: LoginModel) => {
                 let currRoom: RoomModel = this.room;
                 let currUsr: LoginModel = this.loginData;
                 if (currRoom != null && currUsr != null && currRoom.OwnerId == currUsr.id && currRoom.Id == room.Id) {
                     this.loadRoom(room);
+
+                    this.openMsgWindow(pendingRequestUser);
                 }
             };
 
@@ -353,33 +360,6 @@ export default defineComponent({
         loadRoomUser(usr: LoginModel) {
             this.loginData = usr;
         },
-        async openRequestModal() {
-
-            const modal = await modalController.create({
-                component: requestsModal,
-                componentProps: {
-                    room: this.room
-                },
-                cssClass: "",
-                swipeToClose: true,
-                backdropDismiss: true
-            });
-
-            // modal.onDidDismiss().then((data) => {
-
-            //     if (data['data'] !== undefined && data['data'] !== null) {
-
-            //         let newRoom: RoomModel = data['data'];
-
-            //         this.loadRoom(newRoom);
-            //         this.assignSockets();
-            //     }
-
-            // });
-
-            modal.present();
-
-        },
         async madeRequest(cancel: boolean) {
             let currUsr: LoginModel = this.loginData;
             let currRoom: RoomModel = this.room;
@@ -395,13 +375,40 @@ export default defineComponent({
         },
         async manageRequest(usrId: string, promote: boolean) {
             let currRoom: RoomModel = this.room;
-            await SocketModel.ManageRequest(currRoom.Id, usrId, promote)
+            await SocketModel.ManageRequest(currRoom.Id, usrId, promote);
+
+            this.showManageUserWindow = false;
+            this.closeMsgWindow();
         },
         toggleMute() {
             const audioTrack = this.mediaStream.getAudioTracks()[0];
             audioTrack.enabled = !audioTrack.enabled;
             this.muted = !audioTrack.enabled;
         },
+        openUserWindow(selectedUser: LoginModel) {
+            if (this.loginData.id == this.room.OwnerId && selectedUser.id != this.room.OwnerId) {
+                this.SelectedUser = selectedUser;
+                this.showManageUserWindow = true;
+            }
+        },
+        openMsgWindow(pendingRequestUser: LoginModel) {
+
+            if (pendingRequestUser != null && pendingRequestUser.pendingRequest && pendingRequestUser.id != this.loginData.id && this.room.OwnerId == this.loginData.id) {
+                this.showMsgWindow = true;
+                this.LastPendingRequestUser = pendingRequestUser;
+            }
+
+        },
+        closeMsgWindow() {
+            this.showMsgWindow = false;
+            this.LastPendingRequestUser = new LoginModel();
+        },
+        async manageMsgWindowRequest(usrId: string, promote: boolean) {
+            await this.manageMsgWindowRequest(usrId, promote);
+
+            this.showMsgWindow = false;
+            this.LastPendingRequestUser = new LoginModel();
+        }
     },
     mounted() {
         this.init();
