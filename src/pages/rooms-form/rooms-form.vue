@@ -25,6 +25,111 @@
             </ion-toolbar>
         </ion-header>
         <ion-content>
+
+            <!-- Toasts -->
+            <!-- Añadir slideDown para hacer aparecer -->
+            <div class="toast success">
+                <div class="sup">
+                    <div class="icono">
+                        <i class="fal fa-hand-paper"></i>
+                    </div>
+                    <div>
+                        <p>You have been moved to the group of speakers. Now you can speak.</p>
+                    </div>
+                    <div class="close">
+                        <i class="fal fa-times"></i>
+                    </div>
+                </div>
+                <div class="action">
+                    <div>
+                        <button class="btn btn-translucent">Deny</button>
+                    </div>
+                    <div>
+                        <button class="btn btn-light">Allow to speak</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Toasts -->
+
+            <!-- Modales manuales-->
+            <!--<div class="modalManual">
+                <div class="cuerpo">
+                    <button class="icoClose"><i class="far fa-times"></i></button>
+                    <div class="cabeceraConFoto">
+                        <div class="foto">
+                            <img src="/assets/images/usuario-01.png" alt="ejemplo" />
+                            <div class="circulo">
+                                  <i class="far fa-hand-paper"></i>
+                             </div>
+                        </div>
+                        <div class="texto">
+                            <h2>@SmaliBrailovski</h2>
+                        </div>
+                    </div>
+                    <div class="action text-center">
+                        <div>
+                            <button class="btn btn-secondary">Move to speakers</button>
+                        </div>
+                        <div class="mt10">
+                            <button class="btn btn-default">Eject of the room</button>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div class="modalManual">
+                <div class="cuerpo">
+                    <button class="icoClose"><i class="far fa-times"></i></button>
+                    <div class="cabecera">
+                        <div class="icono">
+                            <img src="/assets/images/ico-mano-alzada.svg" alt="mano-alzada" />
+                        </div>
+                        <div class="texto">
+                            <h2>List of raised hands</h2>
+                            <p>Open to everyone</p>
+                        </div>
+                    </div>
+                    <div class="action">
+                        <div>
+                            <p>No one has raised their hand yet!</p>    
+                        </div>
+                        <div class="gridInvitaciones">
+                            <div class="tarjeta">
+                                <div class="izquierda">
+                                    <div>
+                                        <div class="foto">
+                                            <img src="/assets/images/usuario-01.png" alt="ejemplo" />
+                                        </div>
+                                        <div>
+                                            <h4>@SmaliBrailovskiSmaliBrailovski</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="derecha">
+                                    <button class="btn btn-secondary btn-sm">Allow</button>
+                                    <button class="btn btn-default btn-sm">Deny</button>
+                                </div>
+                            </div>
+                            <div class="tarjeta">
+                                <div class="izquierda">
+                                    <div>
+                                        <div class="foto">
+                                            <img src="/assets/images/usuario-01.png" alt="ejemplo" />
+                                        </div>
+                                        <div>
+                                            <h4>@SmaliBrailovskiSmaliBrailovski</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="derecha">
+                                    <button class="btn btn-secondary btn-sm">Allow</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+            <!-- Modales manuales-->
+
             <div class="estructuraFlex saveFaldon">
                 <div class="cabeceraInt flex" v-if="room">
                     <div>
@@ -46,41 +151,7 @@
                     </div>
                 </div>
 
-                <!-- Toasts -->
-                <!--<div class="toast success">
-                    <div class="icono">
-                        <i class="fal fa-hand-paper"></i>
-                    </div>
-                    <div>
-                        <p>You have been moved to the group of speakers. Now you can speak.</p>
-                    </div>
-                    <div class="close">
-                        <i class="fal fa-times"></i>
-                    </div>
-                </div>-->
-                <!--<div class="toast warning">
-                    <div class="icono">
-                        <i class="fal fa-hand-paper"></i>
-                    </div>
-                    <div>
-                        <p>You have been moved to the group of speakers. Now you can speak.</p>
-                    </div>
-                    <div class="close">
-                        <i class="fal fa-times"></i>
-                    </div>
-                </div>-->
-                <!--<div class="toast error">
-                    <div class="icono">
-                        <i class="fal fa-hand-paper"></i>
-                    </div>
-                    <div>
-                        <p>You have been moved to the group of speakers. Now you can speak.</p>
-                    </div>
-                    <div class="close">
-                        <i class="fal fa-times"></i>
-                    </div>
-                </div>-->
-                <!-- Toasts -->
+                
 
                 <div class="gridUsers">
                     <div v-if="!room.onlySound && owner" class="mainVideo">

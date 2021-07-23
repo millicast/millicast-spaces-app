@@ -52,7 +52,7 @@ ion-app {
   margin-right: 6px;
 }
 
-  /* botones nuevos redondeados */
+/* botones */
 .btn{
     display: inline-block;
     font-weight: 500;
@@ -66,15 +66,15 @@ ion-app {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     line-height: 1.6;
     text-decoration: none;
-    min-width: 147px;
+    /*min-width: 147px;*/
   }
   .btn.btn-lg{
     padding: 14px 26px;
     font-size: 16px;
   }
   .btn.btn-sm{
-    padding: 11px 20px;
-      font-size: 0.80rem;
+    padding: 4px 14px;
+    font-size: 12px;
   }
   .btn.btn-primary{
     background-color: var(--ion-color-primary);
@@ -184,6 +184,11 @@ ion-app {
         align-items: center;
     }
 }
+.btn-translucent{
+  background-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+/* Fin botones */
 
   .w100{
     width: 100%;
@@ -214,6 +219,9 @@ ion-app {
   }
   .mt30{
     margin-top: 30px !important;
+  }
+  .mt10{
+    margin-top: 10px !important;
   }
   .mt20{
     margin-top: 20px !important;
@@ -385,7 +393,16 @@ ion-app {
   left: 0;
   z-index: 99;
   padding: 20px;
-  display: flex;
+  transition: all .7s ease-in-out;
+  opacity: 0;
+  .sup{
+    display: flex;
+  }
+  .action{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
   .icono{
     margin-right: 12px;
     margin-top: 4px;
@@ -404,6 +421,9 @@ ion-app {
   &.success{
     background-color: #00DC84;
     color: white;
+    .btn-light{
+      color: #00DC84;
+    }
   }
   &.warning{
     background-color: #f39c12;
@@ -412,5 +432,188 @@ ion-app {
   &.error{
     background-color: #e74c3c;
     color: white;
+  }
+}
+@keyframes slideDown {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  50% {
+    transform: translateY(8%);
+  }
+
+  65% {
+    transform: translateY(-4%);
+  }
+
+  80% {
+    transform: translateY(4%);
+  }
+
+  95% {
+    transform: translateY(-2%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@-webkit-keyframes slideDown {
+  0% {
+    -webkit-transform: translateY(-100%);
+  }
+
+  50% {
+    -webkit-transform: translateY(8%);
+  }
+
+  65% {
+    -webkit-transform: translateY(-4%);
+  }
+
+  80% {
+    -webkit-transform: translateY(4%);
+  }
+
+  95% {
+    -webkit-transform: translateY(-2%);
+  }
+
+  100% {
+    -webkit-transform: translateY(0%);
+  }
+}
+.slideDown {
+  animation-name: slideDown;
+  -webkit-animation-name: slideDown;
+  animation-duration: 1s;
+  -webkit-animation-duration: 1s;
+  animation-timing-function: ease;
+  -webkit-animation-timing-function: ease;
+  opacity: 1 !important;
+}
+.modalManual{
+  position: fixed;
+  z-index: 999;
+  background-color: rgba(0,0,0, 0.6);
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  .cuerpo{
+    background-color: white;
+    padding: 30px 20px 20px 20px;
+    width: 100%;
+    box-shadow: 0 -3px 6px rgba(0,0,0,0.06);
+    border-radius: 25px 25px 0 0;
+    position: relative;
+    max-height: 50vh;
+    overflow-y: auto;
+    .icoClose{
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      font-size: 20px;
+      color: #000000;
+      background: transparent;
+      border: 0;
+      padding: 5px;
+    }
+    .cabeceraConFoto{
+      display: flex;
+      .foto{
+        position: relative;
+        img{
+          display: block;
+        }
+        .circulo{
+          position: absolute;
+          bottom: 0;
+          right: -10px;
+          width: 29px;
+          height: 29px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 15px;
+          border-radius: 50%;
+          border: 1px solid transparent;
+          transition: all .1s ease-in-out;
+          background-color: #181818;
+          color: white;
+        }
+      }
+      .texto{
+        margin-left: 16px;
+        h2{
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0;
+        }
+      }
+    }
+    .cabecera{
+      display: flex;
+      .icono{
+        padding-top: 2px;
+      }
+      .texto{
+        margin-left: 16px;
+        h2{
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0;
+        }
+        p{
+          font-size: 12px;
+          margin: 4px 0 0 0;
+        }
+      }
+    }
+    .action{
+      margin-top: 20px;
+      text-align: center;
+      p{
+        color: #777777;
+        font-size: 12px;
+      }
+    }
+    .gridInvitaciones{
+      .tarjeta{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .foto img{
+          display: block;
+          height: 49px;
+        }
+        .izquierda > div{
+          display: flex;
+          align-items: center;
+          h4{
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            font-size: 14px;
+            margin: 0 0 0 10px;
+          }
+        }
+        .derecha{
+          button{
+            margin-left: 5px;
+          }
+        }
+      }
+      > .tarjeta:not(:last-child){
+        margin-bottom: 10px;
+      }
+    }
   }
 }
