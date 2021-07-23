@@ -68,6 +68,9 @@ ion-app {
     text-decoration: none;
     /*min-width: 147px;*/
   }
+  .btn[disabled]{
+    opacity: 0.7;
+  }
   .btn.btn-lg{
     padding: 14px 26px;
     font-size: 16px;
@@ -395,6 +398,7 @@ ion-app {
   padding: 20px;
   transition: all .7s ease-in-out;
   opacity: 0;
+  z-index: -1;
   .sup{
     display: flex;
   }
@@ -493,6 +497,7 @@ ion-app {
   animation-timing-function: ease;
   -webkit-animation-timing-function: ease;
   opacity: 1 !important;
+  z-index: 99 !important;
 }
 .modalManual{
   position: fixed;

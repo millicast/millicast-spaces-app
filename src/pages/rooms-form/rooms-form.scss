@@ -51,22 +51,23 @@
             bottom: 1px;
             height: 1px;
             background-color: #BAC4D3;
-            width:96%;
+            width: 100%;
         }
         div{
             background-color: white;
             position: relative;
             z-index: 2;
-            min-height: 25px;
         }
         img{
             margin-right: 12px;
-            vertical-align: 4px;
+            /*vertical-align: 4px;*/
+            display: block;
         }
         h3{
             margin: 0;
             font-size: 14px;
             font-weight: normal;
+            padding-right: 10px;
             span{
                 color: #A2B0C5;
             }
