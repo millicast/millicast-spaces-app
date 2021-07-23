@@ -34,8 +34,7 @@
                         <i class="fal fa-hand-paper"></i>
                     </div>
                     <div>
-                        <p>The user {{LastPendingRequestUser.user}} has made a request.</p>
-                        <!--<p>You have been moved to the group of speakers. Now you can speak.</p>-->
+                        <p>The user {{LastPendingRequestUser.user}} has something to say. Invite as speaker?</p>
                     </div>
                     <div class="close" @click="closeMsgWindow();">
                         <i class="fal fa-times"></i>
@@ -64,7 +63,7 @@
                              </div>
                         </div>
                         <div class="texto">
-                            <h2>@{{SelectedUser.user}}</h2>
+                            <h2>{{SelectedUser.user}}</h2>
                         </div>
                     </div>
                     <div class="action text-center">
@@ -163,18 +162,15 @@
                         @click="openUserWindow(speaker);"
                     >
                         <div>
-                        <div class="foto" :data-speakerid="speaker.id" v-bind:style="{'--luminosidad': (speaker.audioLevel>0.01 ? (50 - 50 * speaker.audioLevel ) : 50)+'%'}">
-                            <div class="marco">
-                                <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
+                            <div class="foto" :data-speakerid="speaker.id" v-bind:style="{'--luminosidad': (speaker.audioLevel>0.01 ? (50 - 50 * speaker.audioLevel ) : 50)+'%'}">
+                                <div class="marco">
+                                    <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
+                                </div>
+                                <div class="circulo">
+                                    <i class="far fa-microphone"></i>
+                                </div>
                             </div>
-                            <div class="circulo">
-                                <i class="far fa-microphone"></i>
-                            </div>
-                        </div>
-                        <h4>{{speaker.user}}</h4>
-                        <span v-if="loginData.id == room.OwnerId && speaker.id != room.OwnerId">
-                            <span @click="manageRequest(speaker.id, false)">Demote</span>
-                        </span>
+                            <h4>{{speaker.user}}</h4>
                         </div>
                     </div>
                 </div>

@@ -59,8 +59,7 @@
             z-index: 2;
         }
         img{
-            margin-right: 12px;
-            /*vertical-align: 4px;*/
+            margin-right: 7px;
             display: block;
         }
         h3{
@@ -100,11 +99,11 @@
             }
         }
         &.audience{
-            margin: -15px;
+            margin: -10px;
             > div{
                 flex-basis: 25%;
                 > div{
-                    margin: 15px;
+                    margin: 10px;
                 }
             }
         }
