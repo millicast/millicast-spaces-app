@@ -73,6 +73,9 @@
                 .fotos{
                     position: relative;
                     max-width: 101px;
+                    img{
+                        height: 58px;
+                    }
                     .superpuesta{
                         position: absolute;
                         top: 10px;

@@ -82,8 +82,8 @@
                         <div class="cuerpo">
                             <div>
                                 <div class="fotos" v-if="roomItem.onlySound">
-                                    <img src="/assets/images/usuario-01.png" alt="speaker" class="normal" />
-                                    <img src="/assets/images/usuario-01.png" alt="speaker" class="superpuesta" />
+                                    <img src="/assets/images/usuario-01.png" alt="usuario" class="normal" />
+                                    <img src="/assets/images/usuario-02.png" alt="usuario" class="superpuesta" />
                                 </div>
                                 <div class="videos" v-if="roomItem.onlySound == false">
                                     <div>
