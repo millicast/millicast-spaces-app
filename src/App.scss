@@ -66,7 +66,6 @@ ion-app {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     line-height: 1.6;
     text-decoration: none;
-    /*min-width: 147px;*/
   }
   .btn[disabled]{
     opacity: 0.7;
@@ -98,12 +97,15 @@ ion-app {
     color: var(--ion-color-primary);
   }
   .btn.btn-light:hover{
-    background-color: #e2e6ea;
+    background-color: var(--ion-color-light-shade);
     color: var(--ion-color-primary);
   }
   .btn.btn-light:focus{
     background-color: #e2e6ea;
-      box-shadow: 0 0 0 0.2rem #d8d9db80;
+    color: var(--ion-color-primary);
+    box-shadow: 0 0 0 0.2rem #d8d9db80;
+    border-color: var(--ion-color-light-shade);
+    box-shadow: 0 0 0 0.2rem var(--ion-color-light-tint);
   }
   .btn.btn-redondeado{
     border-radius: 50%;

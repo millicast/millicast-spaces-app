@@ -8,8 +8,6 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '../pages/login'
-    //redirect: '../roomslist'
-    // ñapa
   },
   {
     path: '/login',
