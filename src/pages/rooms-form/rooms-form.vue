@@ -34,14 +34,15 @@
                         <i class="fal fa-hand-paper"></i>
                     </div>
                     <div>
-                        <p>The user {{LastPendingRequestUser.user}} has made a request.</p>
-                        <!--<p>You have been moved to the group of speakers. Now you can speak.</p>-->
+                        <p v-if="LastPendingRequestUser.id != loginData.id">The user {{LastPendingRequestUser.user}} has made a request.</p>
+                        <p v-if="LastPendingRequestUser.id == loginData.id && LastPendingRequestUser.id != room.OwnerId && room.speakers != undefined && room.speakers.filter(f => f.id == LastPendingRequestUser.id).length > 0">You have been moved to the group of speakers. Now you can speak.</p>
+                        <p v-if="LastPendingRequestUser.id == loginData.id && LastPendingRequestUser.id != room.OwnerId && room.members != undefined && room.members.filter(f => f.id == LastPendingRequestUser.id).length > 0">You have been moved to the group of viewers. Now you can't speak.</p>
                     </div>
                     <div class="close" @click="closeMsgWindow();">
                         <i class="fal fa-times"></i>
                     </div>
                 </div>
-                <div class="action">
+                <div class="action" v-if="loginData.id == room.OwnerId">
                     <div>
                         <button class="btn btn-translucent" @click="manageRequest(LastPendingRequestUser.id, false)">Deny</button>
                     </div>

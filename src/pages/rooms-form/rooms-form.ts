@@ -76,10 +76,14 @@ export default defineComponent({
             SocketModel.callbackUserPromoted = async (roomId: string, tokens: TokenModel) => {
                 //Start publishing
                 this.preparePublisher(this.loginData, tokens, this.room);
+
+                this.openMsgWindow(this.loginData);
             };
             SocketModel.callbackUserDemoted = async (roomId: string) => {
                 //Stop publishing
                 this.stopPublisher();
+
+                this.openMsgWindow(this.loginData);
             };
             SocketModel.callbackUpdateRoom = async (room: RoomModel) => {
                 let currRoom: RoomModel = this.room;
@@ -394,6 +398,11 @@ export default defineComponent({
         openMsgWindow(pendingRequestUser: LoginModel) {
 
             if (pendingRequestUser != null && pendingRequestUser.pendingRequest && pendingRequestUser.id != this.loginData.id && this.room.OwnerId == this.loginData.id) {
+                this.showMsgWindow = true;
+                this.LastPendingRequestUser = pendingRequestUser;
+            }
+            
+            if(pendingRequestUser != null && pendingRequestUser.pendingRequest != true && pendingRequestUser.id == this.loginData.id){
                 this.showMsgWindow = true;
                 this.LastPendingRequestUser = pendingRequestUser;
             }
