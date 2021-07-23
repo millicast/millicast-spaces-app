@@ -78,7 +78,7 @@
             </div>-->
             <!--<div class="modalManual">
                 <div class="cuerpo">
-                    <button class="icoClose"><i class="far fa-times"></i></button>
+                    <button class="icoClose" @click="closeRequestModal()"><i class="far fa-times"></i></button>
                     <div class="cabecera">
                         <div class="icono">
                             <img src="/assets/images/ico-mano-alzada.svg" alt="mano-alzada" />
@@ -93,37 +93,24 @@
                             <p>No one has raised their hand yet!</p>    
                         </div>
                         <div class="gridInvitaciones">
-                            <div class="tarjeta">
+
+                            <div class="tarjeta" v-for="member in (room.members != undefined ? room.members.filter(f => f.pendingRequest != null && f.pendingRequest) : [])" :key="member.id">
                                 <div class="izquierda">
                                     <div>
                                         <div class="foto">
                                             <img src="/assets/images/usuario-01.png" alt="ejemplo" />
                                         </div>
                                         <div>
-                                            <h4>@SmaliBrailovskiSmaliBrailovski</h4>
+                                            <h4>@{{member.user}}</h4>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="derecha">
-                                    <button class="btn btn-secondary btn-sm">Allow</button>
-                                    <button class="btn btn-default btn-sm">Deny</button>
+                                    <button class="btn btn-secondary btn-sm" @click="manageRequest(member.id, true)">Allow</button>
+                                    <button class="btn btn-default btn-sm" @click="manageRequest(member.id, false)">Deny</button>
                                 </div>
                             </div>
-                            <div class="tarjeta">
-                                <div class="izquierda">
-                                    <div>
-                                        <div class="foto">
-                                            <img src="/assets/images/usuario-01.png" alt="ejemplo" />
-                                        </div>
-                                        <div>
-                                            <h4>@SmaliBrailovskiSmaliBrailovski</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="derecha">
-                                    <button class="btn btn-secondary btn-sm">Allow</button>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>

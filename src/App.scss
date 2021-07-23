@@ -621,4 +621,7 @@ ion-app {
       }
     }
   }
+  &.hidden{
+    display: none;
+  }
 }
