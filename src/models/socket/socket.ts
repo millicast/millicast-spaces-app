@@ -4,6 +4,7 @@ import LoginModel from '../login/LoginModel';
 import ResultModel from '../common/ResultModel';
 import RoomModel from '../rooms/RoomModel';
 import TokenModel from '../common/TokenModel';
+import ConfigModel from '../config/config';
 
 class JoinModel {
     tokens: TokenModel
@@ -13,8 +14,7 @@ class JoinModel {
 export default class SocketModel {
     private static io: Socket<DefaultEventsMap, DefaultEventsMap>
     public static initialize(): void {
-        // SocketModel.io = io('http://localhost:3000')
-        SocketModel.io = io('https://millicastserver.fontventa.com')
+        SocketModel.io = io(ConfigModel.ServerURL)
         SocketModel.io.connect()
 
         SocketModel.io.on("rooms-list", (roomList: RoomModel[]) => {

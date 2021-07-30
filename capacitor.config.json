@@ -1,6 +1,6 @@
 {
 	"appId": "io.ionic.starter",
-	"appName": "VueTest",
+	"appName": "Millicast App",
 	"webDir": "dist",
 	"bundledWebRuntime": false
 }
