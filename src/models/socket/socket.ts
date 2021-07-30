@@ -13,6 +13,7 @@ class JoinModel {
 export default class SocketModel {
     private static io: Socket<DefaultEventsMap, DefaultEventsMap>
     public static initialize(): void {
+        // SocketModel.io = io('http://localhost:3000')
         SocketModel.io = io('https://millicastserver.fontventa.com')
         SocketModel.io.connect()
 
@@ -51,6 +52,19 @@ export default class SocketModel {
                 SocketModel.callbackDisconnected();
             }
         });
+
+        SocketModel.io.on('user-ejected', (roomId: string) => {
+            if (SocketModel.callbackUserEjected != null) {
+                SocketModel.callbackUserEjected(roomId)
+            }
+        })
+
+        SocketModel.io.on('user-muted', (roomId: string) => {
+            if (SocketModel.callbackUserMute != null) {
+                SocketModel.callbackUserMute(roomId)
+            }
+        })
+
     }
 
     //#region LOGIN
@@ -168,12 +182,38 @@ export default class SocketModel {
         })
     }
 
+    public static EjectFromRoom(roomId: string, usrId: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            SocketModel.io.emit('eject-from-room', roomId, usrId, (result: ResultModel<void>) => {
+                if (result.Error.HasError) {
+                    reject(new Error(result.Error.Message))
+                } else {
+                    resolve(result.content)
+                }
+            })
+        })
+    }
+
+    public static MuteSpeaker(roomId: string, usrId: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            SocketModel.io.emit('mute-speaker', roomId, usrId, (result: ResultModel<void>) => {
+                if (result.Error.HasError) {
+                    reject(new Error(result.Error.Message))
+                } else {
+                    resolve(result.content)
+                }
+            })
+        })
+    }
+
     public static callbackUpdateRooms: (roomsList: RoomModel[]) => void
     public static callbackUpdateRoom: (room: RoomModel) => void
     public static callbackUpdateRoomRequests: (room: RoomModel, pendingRequestUser: LoginModel) => void
     public static callbackUserPromoted: (roomId: string, tokens: TokenModel) => void
     public static callbackUserDemoted: (roomId: string) => void
     public static callbackDisconnected: () => void
+    public static callbackUserEjected: (roomId: string) => void
+    public static callbackUserMute: (roomId: string) => void
 
     //#endregion
 

@@ -246,5 +246,12 @@
         .dcha{
             margin-left: auto;
         }
+        .right-buttons{
+            display: flex;
+            margin: -5px;
+            > div{
+                margin: 5px;
+            }
+        }
     }
 }

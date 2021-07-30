@@ -85,6 +85,17 @@ export default defineComponent({
 
                 this.openMsgWindow(this.loginData);
             };
+            SocketModel.callbackUserEjected = async (roomId: string) => {
+                this.$router.back()
+
+            }
+            SocketModel.callbackUserMute = async (roomId: string) => {
+                const audioTrack = this.mediaStream.getAudioTracks()[0];
+                audioTrack.enabled = false;
+                this.muted = !audioTrack.enabled;
+                console.log('You have been muted.')
+            }
+
             SocketModel.callbackUpdateRoom = async (room: RoomModel) => {
                 let currRoom: RoomModel = this.room;
                 let currUsr: LoginModel = this.loginData;
@@ -383,6 +394,22 @@ export default defineComponent({
 
             this.showManageUserWindow = false;
             this.closeMsgWindow();
+        },
+        async ejectFromRoom(usrId: string) {
+            let currRoom: RoomModel = this.room;
+            await SocketModel.EjectFromRoom(currRoom.Id, usrId)
+
+            this.showManageUserWindow = false;
+            this.closeMsgWindow();
+        },
+        async muteSpeaker(usrId: string) {
+            let currRoom: RoomModel = this.room;
+            await SocketModel.MuteSpeaker(currRoom.Id, usrId)
+
+            console.log('Mute user: ' + usrId)
+
+            this.showManageUserWindow = false
+            this.closeMsgWindow()
         },
         toggleMute() {
             const audioTrack = this.mediaStream.getAudioTracks()[0];
