@@ -12,6 +12,7 @@
     "ionic:serve": "vue-cli-service serve"
   },
   "dependencies": {
+    "@capacitor/android": "^3.1.2",
     "@capacitor/app": "1.0.2",
     "@capacitor/core": "^3.0.2",
     "@capacitor/haptics": "1.0.2",
