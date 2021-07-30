@@ -74,7 +74,10 @@
                             <button class="btn btn-secondary" v-if="room.speakers != undefined && room.speakers.filter(f => f.id == SelectedUser.id).length > 0" @click="manageRequest(SelectedUser.id, false)">Move to viewers</button>
                         </div>
                         <div class="mt10">
-                            <button class="btn btn-default">Eject of the room</button>
+                            <button class="btn btn-default" @click="ejectFromRoom(SelectedUser.id)">Eject from the room</button>
+                        </div>
+                        <div class="mt10" v-if="room.speakers != undefined && room.speakers.filter(f => f.id == SelectedUser.id).length > 0">
+                            <button class="btn btn-default" @click="muteSpeaker(SelectedUser.id)">Mute speaker</button>
                         </div>
                     </div>
                 </div>
@@ -185,7 +188,7 @@
                      </div>
                 </div>
                 <div class="gridUsers audience">
-                    <div v-for="member in room.members" :key="member.id" v-bind:class="{'raised-hand': member.pendingRequest}" @click="openUserWindow(member);">
+                    <div class="muteado" v-for="member in room.members" :key="member.id" v-bind:class="{'raised-hand': member.pendingRequest}" @click="openUserWindow(member);">
                          <div>
                              <div class="foto" >
                                  <div class="marco">
@@ -194,6 +197,9 @@
                                  <div v-if="member.pendingRequest" class="circulo">
                                       <i class="far fa-hand-paper"></i>
                                  </div>
+                                <div class="circulo">
+                                    <i class="far fa-microphone"></i>
+                                </div>
                              </div>
                              <h4>{{member.user}}</h4>
                          </div>
@@ -206,24 +212,28 @@
                 <div>
                     <button class="btn btn-dark" @click="$router.back()"><i class="far fa-sign-out marginright"></i>Leave room</button>
                 </div>
-                <div v-if="loginData.id == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
-                    <button class="btn btn-default btn-redondeado" @click="showPendingRequestsList = true;">
-                        <i class="far fa-handshake"></i>
-                     </button>
-                </div>
-                <div v-if="publishing">
-                    <button class="btn btn-default btn-redondeado" @click="toggleMute()">
-                        <i class="far fa-microphone" v-if="!muted"></i>
-                        <i class="far fa-microphone-alt-slash" v-else></i>
-                      </button>
-                </div>
-                <div v-else>
-                    <button class="btn btn-default btn-redondeado" @click="madeRequest(true)" v-if="loginData.id != room.OwnerId && (loginData.pendingRequest == null || loginData.pendingRequest == false) && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
-                      <i class="far fa-hand-paper"></i>
-                    </button>
-                    <button class="btn btn-default btn-redondeado" @click="madeRequest(false)" v-if="loginData.id != room.OwnerId && loginData.pendingRequest && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
-                      <i class="far fa-hand-paper"></i>
-                    </button>
+                <div>
+                    <div class="right-buttons">
+                        <div v-if="loginData.id == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
+                            <button class="btn btn-default btn-redondeado" @click="showPendingRequestsList = true;">
+                                <i class="far fa-handshake"></i>
+                            </button>
+                        </div>
+                        <div v-if="publishing">
+                            <button class="btn btn-default btn-redondeado" v-bind:class="[muted ? 'btn-default' : 'btn-primary']" @click="toggleMute()">
+                                <i class="far fa-microphone" v-if="!muted"></i>
+                                <i class="far fa-microphone-alt-slash" v-else></i>
+                            </button>
+                        </div>
+                        <div v-else>
+                            <button class="btn btn-default btn-redondeado" @click="madeRequest(true)" v-if="loginData.id != room.OwnerId && (loginData.pendingRequest == null || loginData.pendingRequest == false) && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
+                            <i class="far fa-hand-paper"></i>
+                            </button>
+                            <button class="btn btn-default btn-redondeado" @click="madeRequest(false)" v-if="loginData.id != room.OwnerId && loginData.pendingRequest && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
+                            <i class="far fa-hand-paper"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="trianguloAbsolute">
