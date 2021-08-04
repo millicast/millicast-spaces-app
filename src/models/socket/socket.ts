@@ -14,7 +14,7 @@ class JoinModel {
 export default class SocketModel {
     private static io: Socket<DefaultEventsMap, DefaultEventsMap>
     public static initialize(): void {
-        SocketModel.io = io(ConfigModel.ServerURL)
+        SocketModel.io = io(ConfigModel.ServerURL,ConfigModel.ServerOptions)
         SocketModel.io.connect()
 
         SocketModel.io.on("rooms-list", (roomList: RoomModel[]) => {
