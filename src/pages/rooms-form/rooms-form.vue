@@ -197,9 +197,6 @@
                                  <div v-if="member.pendingRequest" class="circulo">
                                       <i class="far fa-hand-paper"></i>
                                  </div>
-                                <div class="circulo">
-                                    <i class="far fa-microphone"></i>
-                                </div>
                              </div>
                              <h4>{{member.user}}</h4>
                          </div>
