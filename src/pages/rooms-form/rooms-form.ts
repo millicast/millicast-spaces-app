@@ -309,7 +309,7 @@ export default defineComponent({
 
             await this.viewer.connect({
                 pinnedSourceId: room.OwnerId != sourceId ? room.OwnerId : null,
-                multiplexedAudioTracks: 1,
+                multiplexedAudioTracks: 3,
                 excludedSourceIds: [sourceId],
                 disableVideo: room.onlySound || room.OwnerId == sourceId,
                 dtx: true,
