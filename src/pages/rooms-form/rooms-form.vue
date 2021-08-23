@@ -167,7 +167,7 @@
                         @click="openUserWindow(speaker);"
                     >
                         <div>
-                            <div class="foto" :data-speakerid="speaker.id" v-bind:style="{'--luminosidad': (speaker.audioLevel>0.01 ? (50 - 50 * speaker.audioLevel ) : 50)+'%'}">
+                            <div class="foto" :data-speakerid="speaker.id" v-bind:style="{'--luminosidad': (speaker.audioLevel>0.01 ? Math.max((75 - 50 * speaker.audioLevel * 2 ),25) : 75)+'%'}">
                                 <div class="marco">
                                     <img src="/assets/images/foto-lily.jpg" alt="Lily" class="img-fluid" />
                                 </div>

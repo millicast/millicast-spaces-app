@@ -159,7 +159,7 @@
     }
     .multiplexed .circulo {
         background: #00DC84;
-        box-shadow: 0 0 0 0 #00DC84;
+        box-shadow: 0 0 0 0 hsla(156deg, 100%, var(--luminosidad), 0.7);
         color: white;
     }
     .hablando .circulo {
@@ -193,28 +193,12 @@
         
         70% {
             /*transform: scale(1);*/
-            box-shadow: 0 0 0 10px rgba(51, 217, 178, 0);
+            box-shadow: 0 0 0 8px hsla(156deg, 100%, var(--luminosidad), 0.5);
         }
         
         100% {
             /*transform: scale(0.95);*/
-            box-shadow: 0 0 0 0 rgba(51, 217, 178, 0);
-        }
-    }
-    @keyframes pulse-morado {
-        0% {
-            /*transform: scale(0.95);*/
-            box-shadow: 0 0 0 0 rgba(99, 61, 188, 0.7);
-        }
-        
-        70% {
-            /*transform: scale(1);*/
-            box-shadow: 0 0 0 10px rgba(51, 217, 178, 0);
-        }
-        
-        100% {
-            /*transform: scale(0.95);*/
-            box-shadow: 0 0 0 0 rgba(51, 217, 178, 0);
+            box-shadow: 0 0 0 0 hsla(156deg, 100%, var(--luminosidad), 0.7);
         }
     }
     @keyframes zoom {
