@@ -45,16 +45,19 @@ export default defineComponent({
     methods: {
         async init() {
             const cntViewerTags = document.getElementById("cntViewerTags")
-            while (cntViewerTags.firstChild)
+            while (cntViewerTags && cntViewerTags.firstChild)
                 cntViewerTags.removeChild(cntViewerTags.firstChild);
 
             const route = useRoute();
 
             const roomId = route.params["roomId"].toString();
+            //The list of multiplexed audios
+            this.multiplexed = {};
             //Read current user from global state
             const user = this.$loginData;
             //Join room and retrieve publisher and viewer stats
             const { tokens, room } = await SocketModel.JoinRoom(roomId);
+          
 
             await Promise.all([
                 this.loadRoomUser(user),
@@ -65,6 +68,9 @@ export default defineComponent({
             ]);
         },
         async close() {
+            //Clean media elements
+            for (const element of document.querySelectorAll<HTMLMediaElement>("audio,video"))
+                element.srcObject = null;
             await Promise.all([
                 this.stopViewer(),
                 this.stopPublisher()
@@ -277,26 +283,16 @@ export default defineComponent({
                         //console.log(`inactive source ${data.sourceId}`);
                         break;
                     case "vad":
-                        //console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
-                        //Get audio tag
-                        const audio: any = document.querySelector(`audio[data-mid="${data.mediaId}"]`);
-                        //TODO: events may be received before the track is added
-                        if (audio) {
-                            if (data.sourceId)
-                                //Set new speaker
-                                audio.dataset.sourceId = data.sourceId;
-                            else
-                                //Remove it
-                                delete (audio.dataset.sourceId);
-
-                        }
+                        console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
+                        //Store the multiplexing info, as the participant info may be received after this data
+                        this.multiplexed[data.mediaId] = data.sourceId;
                         //Find old speaker
-                        const oldSpeaker = this.room.speakers.find(s => s.multiplexedId = data.mediaId);
+                        const oldSpeaker = this.room.speakers.find(s => s.multiplexedId == data.mediaId);
                         //If there was a previous speaker in that multiplexed id
                         if (oldSpeaker) {
                             //Not multiplexed anymore
-                            oldSpeaker.multiplexedId = null;
-                            oldSpeaker.audioLevel = 0;
+                            delete(oldSpeaker.multiplexedId);
+                            delete(oldSpeaker.audioLevel);
                         }
                         //Find new speaker
                         const speaker = this.room.speakers.find(s => s.id == data.sourceId);
@@ -306,13 +302,14 @@ export default defineComponent({
                             speaker.multiplexedId = data.mediaId;
                             speaker.audioLevel = 0;
                         }
+                        console.log("old: " + (oldSpeaker ? oldSpeaker.user : "none") + "new: " + (speaker ? speaker.user : "none"));
 
                 }
             });
 
             await this.viewer.connect({
                 pinnedSourceId: room.OwnerId != sourceId ? room.OwnerId : null,
-                multiplexedAudioTracks: 3,
+                multiplexedAudioTracks: 1,
                 excludedSourceIds: [sourceId],
                 disableVideo: room.onlySound || room.OwnerId == sourceId,
                 dtx: true,
@@ -370,7 +367,20 @@ export default defineComponent({
 
         },
         loadRoom(room: RoomModel) {
+            //Update room data
             this.room = room;
+            //Restore multiplexing data
+            for (let [mediaId,sourceId] of Object.entries(this.multiplexed))
+            {
+                //Find speaker
+                const speaker = this.room.speakers.find(s => s.id == sourceId);
+                //If got it
+                if (speaker) {
+                    //Assing multiplexing id
+                    speaker.multiplexedId = mediaId;
+                    speaker.audioLevel = 0;
+                }
+            }
         },
         loadRoomUser(usr: LoginModel) {
             this.loginData = usr;
@@ -450,7 +460,6 @@ export default defineComponent({
         this.init();
     },
     unmounted() {
-        console.log("desmontado")
         this.close();
     },
 })
