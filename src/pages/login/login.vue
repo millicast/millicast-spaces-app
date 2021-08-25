@@ -39,7 +39,7 @@
                                     <i class="fas fa-user"></i>
                                 </div>
                             </div>
-                            <input type="text" class="form-control form-control-lg" placeholder="@Nickname" @input="loginData.user=$event.target.value" />
+                            <input type="text" class="form-control form-control-lg" placeholder="@Nickname" @input="user.username=$event.target.value" />
                         </div>
                         
                     </div>

@@ -24,18 +24,18 @@ import '@ionic/vue/css/display.css';
 import './theme/variables.css';
 import './assets/css/fa5.min.css';
 
-import LoginModel from './models/login/LoginModel';
+import UserModel from './models/rooms/UserModel';
 import SocketModel from './models/socket/socket';
 
 const app = createApp(App)
   .use(IonicVue)
   .use(router);
 
-app.config.globalProperties.$loginData = new LoginModel();
+app.config.globalProperties.$user = new UserModel();
 SocketModel.initialize()
 
-SocketModel.callbackDisconnected = () => {
-    app.config.globalProperties.$loginData = new LoginModel();
+SocketModel.onDisconnected = () => {
+    app.config.globalProperties.$user = new UserModel();
     router.push({path:"/"})
 }
 

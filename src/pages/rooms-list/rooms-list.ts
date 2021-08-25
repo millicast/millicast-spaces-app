@@ -2,7 +2,7 @@ import {
     IonButton, IonInput, IonPage, IonContent, IonHeader, modalController, IonLabel, IonItem, IonList,
     IonBackButton, IonButtons, IonTitle, IonToolbar, IonFooter
 } from '@ionic/vue';
-import LoginModel from '../../models/login/LoginModel';
+import UserModel from '../../models/rooms/UserModel';
 import { defineComponent } from 'vue';
 import roomsModal from '../rooms-modal/rooms-modal.vue';
 import SocketModel from '../../models/socket/socket';
@@ -10,35 +10,35 @@ import { io, Socket } from 'socket.io-client';
 import RoomModel from '@/models/rooms/RoomModel';
 
 export default defineComponent({
-    name: 'RoomsList',
+    name: 'rooms',
     components: {
         IonButton, IonInput, IonPage, IonContent, IonHeader, IonLabel, IonItem, IonList, IonBackButton, IonButtons,
         IonTitle, IonToolbar, IonFooter
     },
     data() {
         return {
-            loginData: new LoginModel(),
-            roomList: []
+            user: new UserModel(),
+            rooms: []
         }
     },
     methods: {
         async initRooms() {
-            let roomList = await SocketModel.GetRooms();
-            this.loadRooms(roomList);
+            const rooms = await SocketModel.GetRooms();
+            this.loadRooms(rooms);
         },
-        loadRooms(roomList: RoomModel[]) {
+        loadRooms(rooms: RoomModel[]) {
 
-            this.roomList = [];
+            this.rooms = [];
 
-            for (let room of roomList) {
+            for (let room of rooms) {
 
-                this.roomList.push(room);
+                this.rooms.push(room);
 
             }
 
         },
         loaduserData(){
-            this.loginData.user = this.$loginData.user;
+            this.user.username = this.$user.username;
         },
         async openRoomModal() {
 
@@ -56,17 +56,13 @@ export default defineComponent({
         async goToRoom(roomId: string) {
             this.$router.push({ path: `/roomsform/${roomId}` })
         },
-        async exitRooms() {
-            SocketModel.ExitRooms();
-        }
     },
     ionViewDidEnter() {
         this.loaduserData();
-        this.exitRooms();
         this.initRooms();
 
-        SocketModel.callbackUpdateRooms = (roomsList: RoomModel[]) => {
-            this.loadRooms(roomsList);
+        SocketModel.onRoomsUpdated = (rooms: RoomModel[]) => {
+            this.loadRooms(rooms);
         };
     }
 })
