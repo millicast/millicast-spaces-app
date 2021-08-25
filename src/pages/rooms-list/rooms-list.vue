@@ -71,7 +71,7 @@
                     </div>-->
                     
                     <!--dynamic list -->
-                    <div class="tarjeta" v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
+                    <div class="tarjeta" v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.id);">
                         <div class="titulo">
                             <h2>
                                 <i class="fas" v-bind:class="roomItem.audioOnly ? 'fa-microphone' : 'fa-video'"></i>

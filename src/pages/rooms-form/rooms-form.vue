@@ -35,14 +35,14 @@
                     </div>
                     <div>
                         <p v-if="LastPendingRequestUser.id != loginData.id">The user {{LastPendingRequestUser.user}} has something to say. Invite as speaker?</p>
-                        <p v-if="LastPendingRequestUser.id == loginData.id && LastPendingRequestUser.id != room.OwnerId && room.speakers != undefined && room.speakers.filter(f => f.id == LastPendingRequestUser.id).length > 0">You have been moved to the group of speakers. Now you can speak.</p>
-                        <p v-if="LastPendingRequestUser.id == loginData.id && LastPendingRequestUser.id != room.OwnerId && room.members != undefined && room.members.filter(f => f.id == LastPendingRequestUser.id).length > 0">You have been moved to the group of viewers. Now you can't speak.</p>
+                        <p v-if="LastPendingRequestUser.id == loginData.id && LastPendingRequestUser.id != room.ownerId && room.speakers != undefined && room.speakers.filter(f => f.id == LastPendingRequestUser.id).length > 0">You have been moved to the group of speakers. Now you can speak.</p>
+                        <p v-if="LastPendingRequestUser.id == loginData.id && LastPendingRequestUser.id != room.ownerId && room.members != undefined && room.members.filter(f => f.id == LastPendingRequestUser.id).length > 0">You have been moved to the group of viewers. Now you can't speak.</p>
                     </div>
                     <div class="close" @click="closeMsgWindow();">
                         <i class="fal fa-times"></i>
                     </div>
                 </div>
-                <div class="action" v-if="loginData.id == room.OwnerId">
+                <div class="action" v-if="loginData.id == room.ownerId">
                     <div>
                         <button class="btn btn-translucent" @click="manageRequest(LastPendingRequestUser.id, false)">Deny</button>
                     </div>
@@ -162,7 +162,7 @@
                     </div>
 
                     <div v-for="speaker in audioOnlySpeakers" :key="speaker.id" 
-                        v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==loginData.id ||  speaker.id==room.OwnerId,'hablando' : speaker.audioLevel>0.01,'muteado'  : speaker.muted}"
+                        v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==loginData.id ||  speaker.id==room.ownerId,'hablando' : speaker.audioLevel>0.01,'muteado'  : speaker.muted}"
                         v-bind:style="{'--audio-level': speaker.audioLevel>0.01 ? speaker.audioLevel : 0}"
                         @click="openUserWindow(speaker);"
                     >
@@ -211,7 +211,7 @@
                 </div>
                 <div>
                     <div class="right-buttons">
-                        <div v-if="loginData.id == room.OwnerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
+                        <div v-if="loginData.id == room.ownerId && room.members != null && room.members.filter(f => f.pendingRequest != null && f.pendingRequest).length > 0">
                             <button class="btn btn-default btn-redondeado" @click="showPendingRequestsList = true;">
                                 <i class="far fa-handshake"></i>
                             </button>
@@ -223,10 +223,10 @@
                             </button>
                         </div>
                         <div v-else>
-                            <button class="btn btn-default btn-redondeado" @click="madeRequest(true)" v-if="loginData.id != room.OwnerId && (loginData.pendingRequest == null || loginData.pendingRequest == false) && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
+                            <button class="btn btn-default btn-redondeado" @click="madeRequest(true)" v-if="loginData.id != room.ownerId && (loginData.pendingRequest == null || loginData.pendingRequest == false) && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
                             <i class="far fa-hand-paper"></i>
                             </button>
-                            <button class="btn btn-default btn-redondeado" @click="madeRequest(false)" v-if="loginData.id != room.OwnerId && loginData.pendingRequest && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
+                            <button class="btn btn-default btn-redondeado" @click="madeRequest(false)" v-if="loginData.id != room.ownerId && loginData.pendingRequest && room.speakers != null && room.speakers.filter(f => f.id == loginData.id).length == 0">
                             <i class="far fa-hand-paper"></i>
                             </button>
                         </div>

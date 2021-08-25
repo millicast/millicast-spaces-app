@@ -1,7 +1,7 @@
 import LoginModel from '../login/LoginModel';
 export default class RoomModel {
-    public Id: string
-    public OwnerId: string
+    public id: string
+    public ownerId: string
     public name: string
     public audioOnly: boolean
     public speakers: LoginModel[]

@@ -32,7 +32,7 @@ export default defineComponent({
 
             modal.dismiss(newRoom);
 
-            this.$router.push({ path: `/roomsform/${newRoom.Id}` })
+            this.$router.push({ path: `/roomsform/${newRoom.id}` })
         },
         async closeModal() {
             const modal = await modalController.getTop();

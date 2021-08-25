@@ -36,10 +36,10 @@ export default defineComponent({
     },
     computed: {
         audioOnlySpeakers: function () {
-            return this.room.audioOnly ? this.room.speakers : this.room.speakers.filter(m => m.id != this.room.OwnerId);
+            return this.room.audioOnly ? this.room.speakers : this.room.speakers.filter(m => m.id != this.room.ownerId);
         },
         owner: function () {
-            return this.room.speakers.find(m => m.id == this.room.OwnerId);
+            return this.room.speakers.find(m => m.id == this.room.ownerId);
         }
     },
     methods: {
@@ -106,7 +106,7 @@ export default defineComponent({
                 let currRoom: RoomModel = this.room;
                 let currUsr: LoginModel = this.loginData;
 
-                if (currRoom != null && currRoom.Id == room.Id && currUsr != null) {
+                if (currRoom != null && currRoom.id == room.id && currUsr != null) {
 
                     let selectedUser = room.members.filter(f => f.id == currUsr.id)[0] || room.speakers.filter(f => f.id == currUsr.id)[0];
                     this.loadRoom(room);
@@ -117,7 +117,7 @@ export default defineComponent({
             SocketModel.callbackUpdateRoomRequests = (room: RoomModel, pendingRequestUser: LoginModel) => {
                 let currRoom: RoomModel = this.room;
                 let currUsr: LoginModel = this.loginData;
-                if (currRoom != null && currUsr != null && currRoom.OwnerId == currUsr.id && currRoom.Id == room.Id) {
+                if (currRoom != null && currUsr != null && currRoom.ownerId == currUsr.id && currRoom.id == room.id) {
                     this.loadRoom(room);
 
                     this.openMsgWindow(pendingRequestUser);
@@ -161,9 +161,9 @@ export default defineComponent({
             const sourceId = usr.id;
 
             if (tokens.publisherToken != null && this.publisher == null) {
-                this.publisher = new Publish(room.Id, () => { return tokens.publisherToken });
+                this.publisher = new Publish(room.id, () => { return tokens.publisherToken });
                 //We only capture video on video rooms and for the owner
-                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !room.audioOnly && room.OwnerId == sourceId });
+                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !room.audioOnly && room.ownerId == sourceId });
                 //Not muted
                 this.muted = false;
                 //Show local video
@@ -214,7 +214,7 @@ export default defineComponent({
 
             let sourceId = usr.id;
 
-            this.viewer = new View(room.Id, () => { return tokens.viewerToken });
+            this.viewer = new View(room.id, () => { return tokens.viewerToken });
 
             this.viewer.on("track", (event) => {
                 //Get track and transceiver from event
@@ -308,10 +308,10 @@ export default defineComponent({
             });
 
             await this.viewer.connect({
-                pinnedSourceId: room.OwnerId != sourceId ? room.OwnerId : null,
+                pinnedSourceId: room.ownerId != sourceId ? room.ownerId : null,
                 multiplexedAudioTracks: 3,
                 excludedSourceIds: [sourceId],
-                disableVideo: room.audioOnly || room.OwnerId == sourceId,
+                disableVideo: room.audioOnly || room.ownerId == sourceId,
                 dtx: true,
                 peerConfig: {
                     iceServers: []
@@ -322,11 +322,11 @@ export default defineComponent({
             //Get stats periodically
             this.viewingStats = setInterval(async () => {
                 //IF we are not the owners
-                if (this.loginData.id != undefined && this.loginData.id != this.room.OwnerId) {
+                if (this.loginData.id != undefined && this.loginData.id != this.room.ownerId) {
                     //Get first audio transceiver
                     const mainAudio = pc.getTransceivers().filter(t => t.receiver.track.kind == "audio")[0];
                     //Find ownser
-                    const owner = this.room.speakers.find(s => s.id == this.room.OwnerId);
+                    const owner = this.room.speakers.find(s => s.id == this.room.ownerId);
                     //Set mid
                     if (mainAudio && owner)
                         //Set it
@@ -348,7 +348,7 @@ export default defineComponent({
                             if (audio)
                                 //Get audio level
                                 audio.dataset.audioLevel = stat.audioLevel;
-                            //Find transceiver associated to the track Id
+                            //Find transceiver associated to the track id
                             const transceiver = pc.getTransceivers().find(t => t.receiver.track.id == trackId);
                             //Skip if not found
                             if (!transceiver)
@@ -396,25 +396,25 @@ export default defineComponent({
                 roomUsr.pendingRequest = cancel;
             }
 
-            await SocketModel.MadeRequest(currRoom.Id, cancel)
+            await SocketModel.MadeRequest(currRoom.id, cancel)
         },
         async manageRequest(usrId: string, promote: boolean) {
             let currRoom: RoomModel = this.room;
-            await SocketModel.ManageRequest(currRoom.Id, usrId, promote);
+            await SocketModel.ManageRequest(currRoom.id, usrId, promote);
 
             this.showManageUserWindow = false;
             this.closeMsgWindow();
         },
         async ejectFromRoom(usrId: string) {
             let currRoom: RoomModel = this.room;
-            await SocketModel.EjectFromRoom(currRoom.Id, usrId)
+            await SocketModel.EjectFromRoom(currRoom.id, usrId)
 
             this.showManageUserWindow = false;
             this.closeMsgWindow();
         },
         async muteSpeaker(usrId: string) {
             let currRoom: RoomModel = this.room;
-            await SocketModel.MuteSpeaker(currRoom.Id, usrId)
+            await SocketModel.MuteSpeaker(currRoom.id, usrId)
 
             console.log('Mute user: ' + usrId)
 
@@ -427,14 +427,14 @@ export default defineComponent({
             this.muted = !audioTrack.enabled;
         },
         openUserWindow(selectedUser: LoginModel) {
-            if (this.loginData.id == this.room.OwnerId && selectedUser.id != this.room.OwnerId) {
+            if (this.loginData.id == this.room.ownerId && selectedUser.id != this.room.ownerId) {
                 this.SelectedUser = selectedUser;
                 this.showManageUserWindow = true;
             }
         },
         openMsgWindow(pendingRequestUser: LoginModel) {
 
-            if (pendingRequestUser != null && pendingRequestUser.pendingRequest && pendingRequestUser.id != this.loginData.id && this.room.OwnerId == this.loginData.id) {
+            if (pendingRequestUser != null && pendingRequestUser.pendingRequest && pendingRequestUser.id != this.loginData.id && this.room.ownerId == this.loginData.id) {
                 this.showMsgWindow = true;
                 this.LastPendingRequestUser = pendingRequestUser;
             }
