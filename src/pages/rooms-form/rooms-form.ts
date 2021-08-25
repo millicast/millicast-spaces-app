@@ -36,7 +36,7 @@ export default defineComponent({
     },
     computed: {
         audioOnlySpeakers: function () {
-            return this.room.onlySound ? this.room.speakers : this.room.speakers.filter(m => m.id != this.room.OwnerId);
+            return this.room.audioOnly ? this.room.speakers : this.room.speakers.filter(m => m.id != this.room.OwnerId);
         },
         owner: function () {
             return this.room.speakers.find(m => m.id == this.room.OwnerId);
@@ -163,7 +163,7 @@ export default defineComponent({
             if (tokens.publisherToken != null && this.publisher == null) {
                 this.publisher = new Publish(room.Id, () => { return tokens.publisherToken });
                 //We only capture video on video rooms and for the owner
-                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !room.onlySound && room.OwnerId == sourceId });
+                this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !room.audioOnly && room.OwnerId == sourceId });
                 //Not muted
                 this.muted = false;
                 //Show local video
@@ -185,7 +185,7 @@ export default defineComponent({
                 await this.publisher.connect({
                     mediaStream: this.mediaStream,
                     sourceId: sourceId,
-                    disableVideo: room.onlySound,
+                    disableVideo: room.audioOnly,
                     dtx: true,
                     peerConfig: {
                         iceServers: []
@@ -311,7 +311,7 @@ export default defineComponent({
                 pinnedSourceId: room.OwnerId != sourceId ? room.OwnerId : null,
                 multiplexedAudioTracks: 3,
                 excludedSourceIds: [sourceId],
-                disableVideo: room.onlySound || room.OwnerId == sourceId,
+                disableVideo: room.audioOnly || room.OwnerId == sourceId,
                 dtx: true,
                 peerConfig: {
                     iceServers: []

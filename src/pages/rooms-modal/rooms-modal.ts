@@ -26,7 +26,7 @@ export default defineComponent({
             let newRoom = new RoomModel()
 
             newRoom.name = this.room.name
-            newRoom.onlySound = this.room.onlySound
+            newRoom.audioOnly = this.room.audioOnly
 
             newRoom = await SocketModel.CreateRoom(newRoom)
 

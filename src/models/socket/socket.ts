@@ -124,7 +124,7 @@ export default class SocketModel {
 
     public static CreateRoom(room: RoomModel): Promise<RoomModel> {
         return new Promise<RoomModel>((resolve, reject) => {
-            SocketModel.io.emit('create-room', room.name, room.onlySound, (result: ResultModel<RoomModel>) => {
+            SocketModel.io.emit('create-room', room.name, room.audioOnly, (result: ResultModel<RoomModel>) => {
                 if (result.Error.HasError) {
                     reject(new Error(result.Error.Message))
                 } else {

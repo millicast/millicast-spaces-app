@@ -74,18 +74,18 @@
                     <div class="tarjeta" v-for="roomItem in roomList" :key="roomItem.name" @click="goToRoom(roomItem.Id);">
                         <div class="titulo">
                             <h2>
-                                <i class="fas" v-bind:class="roomItem.onlySound ? 'fa-microphone' : 'fa-video'"></i>
+                                <i class="fas" v-bind:class="roomItem.audioOnly ? 'fa-microphone' : 'fa-video'"></i>
                                 <span>{{roomItem.name}}</span>
                             </h2>
                         </div>
                          
                         <div class="cuerpo">
                             <div>
-                                <div class="fotos" v-if="roomItem.onlySound">
+                                <div class="fotos" v-if="roomItem.audioOnly">
                                     <img src="/assets/images/usuario-01.png" alt="usuario" class="normal" />
                                     <img src="/assets/images/usuario-02.png" alt="usuario" class="superpuesta" />
                                 </div>
-                                <div class="videos" v-if="roomItem.onlySound == false">
+                                <div class="videos" v-if="roomItem.audioOnly == false">
                                     <div>
                                         <img src="/assets/images/ejemplo-video.png" alt="thumbnail video" class="normal" />
                                     </div>

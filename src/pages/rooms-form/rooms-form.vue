@@ -147,7 +147,7 @@
                 
 
                 <div class="gridUsers">
-                    <div v-if="!room.onlySound && owner" class="mainVideo">
+                    <div v-if="!room.audioOnly && owner" class="mainVideo">
                         <div>
                             <div class="foto">
                                 <div class="marco">
