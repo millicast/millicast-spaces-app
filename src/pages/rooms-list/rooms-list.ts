@@ -1,6 +1,7 @@
-import {
-    IonButton, IonInput, IonPage, IonContent, IonHeader, modalController, IonLabel, IonItem, IonList,
-    IonBackButton, IonButtons, IonTitle, IonToolbar, IonFooter
+import
+{
+	IonButton, IonInput, IonPage, IonContent, IonHeader, modalController, IonLabel, IonItem, IonList,
+	IonBackButton, IonButtons, IonTitle, IonToolbar, IonFooter
 } from '@ionic/vue';
 import UserModel from '../../models/rooms/UserModel';
 import { defineComponent } from 'vue';
@@ -10,59 +11,63 @@ import { io, Socket } from 'socket.io-client';
 import RoomModel from '@/models/rooms/RoomModel';
 
 export default defineComponent({
-    name: 'rooms',
-    components: {
-        IonButton, IonInput, IonPage, IonContent, IonHeader, IonLabel, IonItem, IonList, IonBackButton, IonButtons,
-        IonTitle, IonToolbar, IonFooter
-    },
-    data() {
-        return {
-            user: new UserModel(),
-            rooms: []
-        }
-    },
-    methods: {
-        async initRooms() {
-            const rooms = await SocketModel.GetRooms();
-            this.loadRooms(rooms);
-        },
-        loadRooms(rooms: RoomModel[]) {
+	name: 'rooms',
+	components: {
+		IonButton, IonInput, IonPage, IonContent, IonHeader, IonLabel, IonItem, IonList, IonBackButton, IonButtons,
+		IonTitle, IonToolbar, IonFooter
+	},
+	data()
+	{
+		return {
+			user: new UserModel(),
+			rooms: []
+		}
+	},
+	methods: {
+		async initRooms()
+		{
+			const rooms = await SocketModel.GetRooms();
+			this.loadRooms(rooms);
+		},
+		loadRooms(rooms: RoomModel[])
+		{
 
-            this.rooms = [];
+			this.rooms = [];
 
-            for (let room of rooms) {
+			for (let room of rooms)
+				this.rooms.push(room);
+		},
+		loaduserData()
+		{
+			this.user.username = this.$user.username;
+		},
+		async openRoomModal()
+		{
 
-                this.rooms.push(room);
+			const modal = await modalController.create({
+				component: roomsModal,
+				componentProps: {
+				},
+				cssClass: "",
+				swipeToClose: true
+			});
 
-            }
+			modal.present();
 
-        },
-        loaduserData(){
-            this.user.username = this.$user.username;
-        },
-        async openRoomModal() {
+		},
+		async goToRoom(roomId: string)
+		{
+			this.$router.push({ path: `/roomsform/${roomId}` })
+		},
+	},
+	ionViewDidEnter()
+	{
+		this.loaduserData();
+		this.initRooms();
 
-            const modal = await modalController.create({
-                component: roomsModal,
-                componentProps: {
-                },
-                cssClass: "",
-                swipeToClose: true
-            });
-
-            modal.present();
-
-        },
-        async goToRoom(roomId: string) {
-            this.$router.push({ path: `/roomsform/${roomId}` })
-        },
-    },
-    ionViewDidEnter() {
-        this.loaduserData();
-        this.initRooms();
-
-        SocketModel.onRoomsUpdated = (rooms: RoomModel[]) => {
-            this.loadRooms(rooms);
-        };
-    }
+		SocketModel.onRoomsUpdated = (rooms: RoomModel[]) =>
+		{
+			this.loadRooms(rooms);
+		};
+	}
 })

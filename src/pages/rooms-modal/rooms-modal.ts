@@ -28,11 +28,11 @@ export default defineComponent({
             newRoom.name = this.room.name
             newRoom.audioOnly = this.room.audioOnly
 
-            newRoom = await SocketModel.CreateRoom(newRoom)
+            const roomId = await SocketModel.CreateRoom(newRoom)
 
-            modal.dismiss(newRoom);
+            modal.dismiss();
 
-            this.$router.push({ path: `/roomsform/${newRoom.id}` })
+            this.$router.push({ path: `/roomsform/${roomId}` })
         },
         async closeModal() {
             const modal = await modalController.getTop();

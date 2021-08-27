@@ -520,7 +520,7 @@ ion-app {
     box-shadow: 0 -3px 6px rgba(0,0,0,0.06);
     border-radius: 25px 25px 0 0;
     position: relative;
-    max-height: 50vh;
+    max-height: 70vh;
     overflow-y: auto;
     .icoClose{
       position: absolute;
@@ -533,16 +533,19 @@ ion-app {
       padding: 5px;
     }
     .cabeceraConFoto{
-      display: flex;
       .foto{
         position: relative;
         img{
           display: block;
+          border-radius: 25px;
+          padding: 5px;
+          width: 340px;
+          height: 340px;
         }
         .circulo{
           position: absolute;
-          bottom: 0;
-          right: -10px;
+          bottom: 10px;
+          right: 25px;
           width: 29px;
           height: 29px;
           display: flex;
@@ -558,6 +561,7 @@ ion-app {
       }
       .texto{
         margin-left: 16px;
+        margin-top: 10px;
         h2{
           font-size: 16px;
           font-weight: 600;
@@ -591,6 +595,12 @@ ion-app {
         font-size: 12px;
       }
     }
+    .action-full{
+      padding: 5px;
+      button {
+        width: 80%;
+      }
+     }
     .gridInvitaciones{
       .tarjeta{
         display: flex;
@@ -599,6 +609,8 @@ ion-app {
         .foto img{
           display: block;
           height: 49px;
+          width: 49px;
+          border-radius: 5px;
         }
         .izquierda > div{
           display: flex;

@@ -1,12 +1,12 @@
 import
-	{
-		IonButton, IonInput, IonPage, IonContent, IonHeader, IonLabel, IonItem, IonList,
-		IonBackButton, IonButtons, IonTitle, IonToolbar, IonFooter, modalController, IonIcon
-	} from '@ionic/vue';
+{
+	IonButton, IonInput, IonPage, IonContent, IonHeader, IonLabel, IonItem, IonList,
+	IonBackButton, IonButtons, IonTitle, IonToolbar, IonFooter, modalController, IonIcon
+} from '@ionic/vue';
 import { defineComponent } from 'vue';
 import UserModel from '../../models/rooms/UserModel';
 import ParticipantModel from '../../models/rooms/ParticipantModel';
-import TokenModel from '../../models/common/TokenModel';
+import TokenModel from '../../models/rooms/TokenModel';
 import RoomModel from '@/models/rooms/RoomModel';
 import { useRoute, useRouter } from 'vue-router';
 import SocketModel from '../../models/socket/socket';
@@ -25,48 +25,74 @@ export default defineComponent({
 	{
 		return {
 			user: new UserModel(),
-			room: new RoomModel(),
+			room: null,
 			viewer: null,
 			publisher: null,
 			publishing: false,
 			muted: false,
-			showPendingRequestsList: false,
 			showManageUserWindow: false,
 			selectedUser: null,
 			lastPendingRequestUser: null,
 			showMsgWindow: false,
-			promotedChanged: false
+			showPendingRequestsList: false,
+			promotedChanged: false,
+			audioOnlySpeakers: [],
+			audience: [],
 		}
 	},
-	computed: {
-		audioOnlySpeakers: function ()
-		{
-			const speakers = [];
-			for (const speakerId of this.room.speakers)
-				if (speakerId!=this.room.ownerId)
-					speakers.push(this.rooms.participants.get(speakerId));
-			return speakers;
+	watch: {
+		"room.speakers": {
+			handler: function (speakers, oldValue)
+			{
+				this.audioOnlySpeakers = [];
+				for (const speakerId in speakers)
+					if (speakerId != this.room.ownerId || this.room.audioOnly)
+						this.audioOnlySpeakers.push(this.room.participants[speakerId]);
+				this.audience = [];
+				for (const participantId in this.room.participants)
+					if (participantId != this.room.ownerId && !this.room.speakers[participantId])
+						this.audience.push(this.room.participants[participantId]);
+				if (this.lastPendingRequestUser && !(this.lastPendingRequestUser.id in this.room.participants))
+					this.lastPendingRequestUser = null;
+			},
+			deep: true
 		},
+		"room.participants":
+		{
+			handler: function (participants)
+			{
+				this.audience = [];
+				for (const participantId in participants)
+					if (participantId != this.room.ownerId && !this.room.speakers[participantId])
+						this.audience.push(participants[participantId]);
+				if (this.lastPendingRequestUser && !(this.lastPendingRequestUser.id in participants))
+					this.lastPendingRequestUser = null;
+			},
+			deep: true
+		},
+	},
+	computed: {
 		owner: function ()
 		{
-			return this.room.speakers.find(m => m.id == this.room.ownerId);
+			return this.room.participants[this.room.ownerId];
 		},
-		audience: function ()
+		us: function ()
 		{
-			const participants = [];
-			for (const [participantId,participant] of this.room.participants)
-				if (participantId!=this.room.ownerId && !this.room.speakers.has(participantId))
-					participants.push(this.rooms.participants.get(participantId));
-			return participants;
+			return this.room.participants[this.user.id];
+		},
+		isOwner: function ()
+		{
+			return this.room.ownerId == this.user.id;
+		},
+		raisedHands: function ()
+		{
+			return this.audience.find(p => p.raisedHand);
 		}
+
 	},
 	methods: {
 		async init()
 		{
-			const cntViewerTags = document.getElementById("cntViewerTags")
-			while (cntViewerTags && cntViewerTags.firstChild)
-				cntViewerTags.removeChild(cntViewerTags.firstChild);
-
 			const route = useRoute();
 
 			const roomId = route.params["roomId"].toString();
@@ -74,14 +100,23 @@ export default defineComponent({
 			this.multiplexed = {};
 			//Read current user from global state
 			const user = this.$user;
-			//Join room and retrieve publisher and viewer stats
-			const { tokens, room } = await SocketModel.JoinRoom(roomId);
-
-
+			//Get room
+			const room = SocketModel.GetRoom(roomId);
+			//Load data
 			await Promise.all([
 				this.loadRoomUser(user),
 				this.loadRoom(room),
 				this.assignSockets(),
+			]);
+
+			const cntViewerTags = document.getElementById("cntViewerTags")
+			while (cntViewerTags && cntViewerTags.firstChild)
+				cntViewerTags.removeChild(cntViewerTags.firstChild);
+
+			//Join room and retrieve publisher and viewer stats
+			const tokens = await SocketModel.JoinRoom(roomId);
+
+			await Promise.all([
 				this.preparePublisher(user, tokens, room),
 				this.prepareViewer(user, tokens, room)
 			]);
@@ -91,9 +126,11 @@ export default defineComponent({
 			//Clean media elements
 			for (const element of document.querySelectorAll<HTMLMediaElement>("audio,video"))
 				element.srcObject = null;
+			if (this.room.id) SocketModel.LeaveRoom(this.room.id);
 			await Promise.all([
 				this.stopViewer(),
-				this.stopPublisher()
+				this.stopPublisher(),
+
 			]);
 
 		},
@@ -127,16 +164,9 @@ export default defineComponent({
 				console.log('You have been muted.')
 			}
 
-			SocketModel.onRoomUpdated = async (room: RoomModel) =>
+			SocketModel.onUserRaisedHand = (roomId: string, participant: ParticipantModel) =>
 			{
-				if (this.room.id == room.id)
-					this.loadRoom(room);
-			};
-
-			SocketModel.onUserRaisedHand = (room: RoomModel, pendingRequestUser: ParticipantModel) =>
-			{
-				if (this.room.id == room.id)
-					this.openMsgWindow(pendingRequestUser);
+				this.openMsgWindow(participant);
 			};
 
 		},
@@ -225,7 +255,7 @@ export default defineComponent({
 						if (stat.kind == "audio" && stat.type == "media-source")
 						{
 							//Find us
-							const us = this.room.speakers.find(s => s.id == this.user.id);
+							const us = this.room.participants[this.user.id];
 							//Set our audio level
 							us.audioLevel = stat.audioLevel;
 							//Done
@@ -317,10 +347,8 @@ export default defineComponent({
 						break;
 					case "vad":
 						console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
-						//Store the multiplexing info, as the participant info may be received after this data
-						this.multiplexed[data.mediaId] = data.sourceId;
 						//Find old speaker
-						const oldSpeaker = this.room.speakers.find(s => s.multiplexedId == data.mediaId);
+						const oldSpeaker = this.room.participants[this.multiplexed[data.mediaId]];
 						//If there was a previous speaker in that multiplexed id
 						if (oldSpeaker)
 						{
@@ -328,8 +356,10 @@ export default defineComponent({
 							delete (oldSpeaker.multiplexedId);
 							delete (oldSpeaker.audioLevel);
 						}
+						//Store the multiplexing info, as the participant info may be received after this data
+						this.multiplexed[data.mediaId] = data.sourceId;
 						//Find new speaker
-						const speaker = this.room.speakers.find(s => s.id == data.sourceId);
+						const speaker = this.room.participants[data.sourceId];
 						//If got it
 						if (speaker)
 						{
@@ -358,16 +388,19 @@ export default defineComponent({
 			this.viewingStats = setInterval(async () =>
 			{
 				//IF we are not the owners
-				if (this.user.id != undefined && this.user.id != this.room.ownerId)
+				if (this.user.id != this.room.ownerId)
 				{
 					//Get first audio transceiver
 					const mainAudio = pc.getTransceivers().filter(t => t.receiver.track.kind == "audio")[0];
 					//Find ownser
-					const owner = this.room.speakers.find(s => s.id == this.room.ownerId);
+					const owner = this.room.participants[this.room.ownerId];
 					//Set mid
 					if (mainAudio && owner)
+					{
 						//Set it
 						owner.multiplexedId = mainAudio.mid;
+						this.multiplexed[mainAudio.mid] = owner.id;
+					}
 				}
 				//Find 
 				const stats = await pc.getStats();
@@ -394,7 +427,7 @@ export default defineComponent({
 							if (!transceiver)
 								continue;
 							//Find new speaker
-							const speaker = this.room.speakers.find(s => s.multiplexedId == transceiver.mid);
+							const speaker = this.room.participants[this.multiplexed[transceiver.mid]];
 							//If got it
 							if (speaker)
 							{
@@ -409,13 +442,14 @@ export default defineComponent({
 		},
 		loadRoom(room: RoomModel)
 		{
+			console.log("loadRoom");
 			//Update room data
 			this.room = room;
 			//Restore multiplexing data
 			for (let [mediaId, sourceId] of Object.entries(this.multiplexed))
 			{
 				//Find speaker
-				const speaker = this.room.speakers.find(s => s.id == sourceId);
+				const speaker = this.room.participants[sourceId as string];
 				//If got it
 				if (speaker)
 				{
@@ -436,6 +470,8 @@ export default defineComponent({
 		async promoteUser(userId: string, promote: boolean)
 		{
 			await SocketModel.PromoteUser(this.room.id, userId, promote);
+			if (this.lastPendingRequestUser && this.lastPendingRequestUser.id == userId)
+				this.lastPendingRequestUser = null;
 			this.showManageUserWindow = false;
 			this.closeMsgWindow();
 		},
@@ -468,44 +504,40 @@ export default defineComponent({
 				this.showManageUserWindow = true;
 			}
 		},
-		openMsgWindow(pendingRequestUser: ParticipantModel)
+		openMsgWindow(participant: ParticipantModel)
 		{
+			if (this.room.ownerId != this.user.id)
+				return;
 
-			if (pendingRequestUser != null && pendingRequestUser.raisedHand && pendingRequestUser.id != this.user.id && this.room.ownerId == this.user.id)
+			if (participant.raisedHand && !this.lastPendingRequestUser)
 			{
-				this.showMsgWindow = true;
-				this.lastPendingRequestUser = pendingRequestUser;
+				//Hide after 5 seconds
+				this.showMsgWindow = setTimeout(() =>
+				{
+					this.closeMsgWindow();
+				}, 5000);
+				this.lastPendingRequestUser = participant;
 			}
 
-			if (pendingRequestUser != null && pendingRequestUser.raisedHand != true && pendingRequestUser.id == this.user.id)
-			{
-				this.showMsgWindow = true;
-				this.lastPendingRequestUser = pendingRequestUser;
-			}
-
+			if (!participant.raisedHand && (this.lastPendingRequestUser && this.lastPendingRequestUser.id == participant.id))
+				this.closeMsgWindow();
 		},
 		closeMsgWindow()
 		{
-			this.showMsgWindow = false;
-			this.lastPendingRequestUser = new ParticipantModel();
-		},
-		async manageMsgWindowRequest(userId: string, promote: boolean)
-		{
-			await this.manageMsgWindowRequest(userId, promote);
-
-			this.showMsgWindow = false;
-			this.lastPendingRequestUser = new ParticipantModel();
+			this.showMsgWindow = clearTimeout(this.showMsgWindow);
+			this.lastPendingRequestUser = null;
 		},
 		showPromoted()
 		{
-			this.clearTimeout(this.promotedChanged)
-			this.promotedChanged = setTimeout(()=>{
+			clearTimeout(this.promotedChanged)
+			this.promotedChanged = setTimeout(() =>
+			{
 				this.promotedChanged = false;
-			});
+			}, 5000);
 		},
 		hidePromoted()
 		{
-			this.clearTimeout(this.promotedChanged)
+			clearTimeout(this.promotedChanged)
 			this.promotedChanged = false;
 		}
 	},

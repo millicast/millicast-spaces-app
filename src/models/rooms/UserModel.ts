@@ -1,4 +1,5 @@
-export default class UserModel {
-    public username: string
-    public id: string
+export default class UserModel
+{
+	public username: string
+	public id: string
 }

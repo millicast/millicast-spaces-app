@@ -41,16 +41,8 @@
                     <p>Create a new room open for everyone</p>
                     <button class="btn btn-primary" @click="createRoom()" :disabled="room.name == '' || room.name == null || room.audioOnly == null">Go</button>
                 </div>
-
-            <!--<div @click="room.audioOnly = false;" v-bind:class="{ 'active': (room.audioOnly != null && !room.audioOnly) }">SOUND AND VIDEO</div>
-            <div @click="room.audioOnly = true;" v-bind:class="{ 'active': (room.audioOnly != null && room.audioOnly) }">SOUND ONLY</div>-->
             </div>
         </ion-content>
-        <!--<ion-footer>
-            <ion-button expand="full" @click="createRoom()" :disabled="room.name == '' || room.name == null || room.audioOnly == null">
-                <ion-label>Create</ion-label>
-            </ion-button>
-        </ion-footer>-->
     </ion-page>
 </template>
 <script src="./rooms-modal.ts" lang="ts"></script>

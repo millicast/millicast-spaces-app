@@ -28,18 +28,20 @@ import UserModel from './models/rooms/UserModel';
 import SocketModel from './models/socket/socket';
 
 const app = createApp(App)
-  .use(IonicVue)
-  .use(router);
+	.use(IonicVue)
+	.use(router);
 
 app.config.globalProperties.$user = new UserModel();
 SocketModel.initialize()
 
-SocketModel.onDisconnected = () => {
-    app.config.globalProperties.$user = new UserModel();
-    router.push({path:"/"})
+SocketModel.onDisconnected = () =>
+{
+	app.config.globalProperties.$user = new UserModel();
+	router.push({ path: "/" })
 }
 
-router.isReady().then(() => {
-  app.mount('#app');
-  router.replace("/")
+router.isReady().then(() =>
+{
+	app.mount('#app');
+	router.replace("/")
 });

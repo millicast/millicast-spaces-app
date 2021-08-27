@@ -56,19 +56,19 @@
                             <div>
                                 <div class="usuarios">
                                     <ul>
-                                        <li v-if="room.participants.has(room.ownerId)" :key="member.id">{{room.participants.get(room.ownerId).username}}</li>
+                                        <li v-if="room.participants[room.ownerId]">{{room.participants[room.ownerId].username}}</li>
                                     </ul>
                                 </div>
                                 <div class="badges">
                                     <div>
                                         <div>
-                                            <p>{{room.speakers.length}}</p>
+                                            <p>{{Object.keys(room.speakers).length}}</p>
                                             <img src="/assets/images/ico-speaker-morado.svg" alt="speakers" />
                                         </div>
                                     </div>
                                     <div>
                                         <div>
-                                            <p>{{room.participants.size}}</p>
+                                          <p>{{Object.keys(room.participants).length-Object.keys(room.speakers).length}}</p>
                                             <img src="/assets/images/ico-audience-morado.svg" alt="audience" />
                                         </div>
                                     </div>

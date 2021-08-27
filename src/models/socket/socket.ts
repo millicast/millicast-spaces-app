@@ -1,209 +1,271 @@
-import { io, Socket } from 'socket.io-client'
-import { DefaultEventsMap } from 'socket.io-client/build/typed-events'
-import UserModel from '../rooms/UserModel';
-import ParticipantModel from '../rooms/ParticipantModel';
-import ResultModel from '../common/ResultModel';
-import RoomModel from '../rooms/RoomModel';
-import TokenModel from '../common/TokenModel';
-import ConfigModel from '../config/config';
+import { io, Socket } from "socket.io-client"
+import { DefaultEventsMap } from "socket.io-client/build/typed-events"
+import UserModel from "../rooms/UserModel";
+import ParticipantModel from "../rooms/ParticipantModel";
+import RoomModel from "../rooms/RoomModel";
+import TokenModel from "../rooms/TokenModel";
+import ConfigModel from "../config/config";
+import { reactive } from "vue";
 
-class JoinModel
-{
-	tokens: TokenModel
-	room: RoomModel
+class ResultModel<T> {
+	error: string
+	data: T
 }
+
+class AuthenticationModel
+{
+	user: UserModel
+	rooms: RoomModel[]
+}
+
 
 export default class SocketModel
 {
 	private static io: Socket<DefaultEventsMap, DefaultEventsMap>
-	private static rooms: Map<string, RoomModel>;
+	private static rooms: Record<string, RoomModel>;
 	public static initialize(): void
 	{
 		SocketModel.io = io(ConfigModel.ServerURL, ConfigModel.ServerOptions)
 		SocketModel.io.connect()
 
-		SocketModel.io.on("room-created", (room: RoomModel) => {
+
+		SocketModel.io.on("room-created", (room: any) =>
+		{
+			console.log(`Room created ${room.id}`);
 			//Add room to list
-			SocketModel.rooms.set(room.id, room);
+			globalThis.room = SocketModel.rooms[room.id] = reactive<RoomModel>(RoomModel.fromJson(room));
 			if (SocketModel.onRoomsUpdated != null)
-				SocketModel.onRoomsUpdated(Array.from(SocketModel.rooms.values()))
+				SocketModel.onRoomsUpdated(Object.values(SocketModel.rooms))
 		})
 
-		SocketModel.io.on("room-deleted", (roomId: string) => {
+		SocketModel.io.on("room-deleted", (roomId: string) =>
+		{
+			console.log(`Room deleted ${roomId}`);
 			//Delete from from list
-			SocketModel.rooms.delete(roomId);
+			delete (SocketModel.rooms[roomId]);
 			if (SocketModel.onRoomsUpdated != null)
-				SocketModel.onRoomsUpdated(Array.from(SocketModel.rooms.values()))
+				SocketModel.onRoomsUpdated(Object.values(SocketModel.rooms))
 		})
 
-		SocketModel.io.on("user-joined", (roomId: string, participant: ParticipantModel) => {
+		SocketModel.io.on("user-joined", (roomId: string, participant: ParticipantModel) =>
+		{
+			console.log(`User ${participant.id}  ${participant.username} joined ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms.get(roomId);
-			//Add participant
-			room.participants.set(participant.id,participant);
-			if (SocketModel.onRoomUpdated != null)
-				SocketModel.onRoomUpdated(room);
+			const room = SocketModel.rooms[roomId];
+			//Add participantd
+			globalThis.participant = room.participants[participant.id] = reactive<ParticipantModel>(participant);
 		})
 
-		SocketModel.io.on("user-left", (roomId: string, userId: string) => {
+		SocketModel.io.on("user-left", (roomId: string, userId: string) =>
+		{
+			console.log(`User ${userId} left ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms.get(roomId);
+			const room = SocketModel.rooms[roomId];
 			//Remove participant
-			room.speakers.delete(userId);
-			room.participants.delete(userId);
-			if (SocketModel.onRoomUpdated != null)
-				SocketModel.onRoomUpdated(room);
+			delete (room.speakers[userId]);
+			delete (room.participants[userId]);
 		})
-		
 
-		SocketModel.io.on("user-raised-hand", (roomId: string, userId: string, raised: boolean) => {
+		SocketModel.io.on("user-raised-hand", (roomId: string, userId: string, raised: boolean) =>
+		{
 			//Get room
-			const room = SocketModel.rooms.get(roomId);
+			const room = SocketModel.rooms[roomId];
 			//Get participant
-			const participant = room.participants.get(userId);
+			const participant = room.participants[userId];
 			//Update raised hand flag
 			participant.raisedHand = raised;
 
 			if (SocketModel.onUserRaisedHand != null)
-				SocketModel.onUserRaisedHand(room, participant);
-			if (SocketModel.onRoomUpdated != null)
-				SocketModel.onRoomUpdated(room);
+				SocketModel.onUserRaisedHand(roomId, participant);
 		})
 
-		SocketModel.io.on("user-promoted", (roomId: string, userId: string, promoted: boolean) => {
+		SocketModel.io.on("user-promoted", (roomId: string, userId: string, promoted: boolean) =>
+		{
+			console.log(`User ${userId} promoted:${promoted} in ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms.get(roomId);
-
+			const room = SocketModel.rooms[roomId];
+			//Get participant
+			const participant = room.participants[userId];
+			//Remove raised hand flag
+			participant.raisedHand = false;
 			if (promoted)
 				//Add to speakers
-				room.speakers.add(userId);
+				room.speakers[userId] = true;
 			else
 				//Remove from speakers
-				room.speakers.add(userId);
-
-			if (SocketModel.onRoomUpdated != null)
-				SocketModel.onRoomUpdated(room);
+				delete (room.speakers[userId]);
 		})
 
-		SocketModel.io.on("user-muted", (roomId: string, userId: string, muted: boolean) => {
+		SocketModel.io.on("user-muted", (roomId: string, userId: string, muted: boolean) =>
+		{
 			//Get room
-			const room = SocketModel.rooms.get(roomId);
+			const room = SocketModel.rooms[roomId];
 			//Get participant
-			const participant = room.participants.get(userId);
+			const participant = room.participants[userId];
 			//Update muted flag
 			participant.muted = muted;
 
-			if (SocketModel.onRoomUpdated != null)
-				SocketModel.onRoomUpdated(room);
 		})
 
-		
 
-		SocketModel.io.on('disconnect', function ()
+		SocketModel.io.on("disconnect", function ()
 		{
+			console.log("disconnected");
 			if (SocketModel.onDisconnected != null)
 				SocketModel.onDisconnected();
 		});
 
-		SocketModel.io.on('kicked', (roomId: string) =>
+		SocketModel.io.on("kicked", (roomId: string) =>
 		{
+			console.log(`You have been kicked from ${roomId}`);
 			if (SocketModel.onKicked != null)
 				SocketModel.onKicked(roomId);
 		})
 
-		SocketModel.io.on('muted', (roomId: string) =>
+		SocketModel.io.on("muted", (roomId: string) =>
 		{
+			console.log(`You have been muted in ${roomId}`);
 			if (SocketModel.onMuted != null)
 				SocketModel.onMuted(roomId);
 		})
 
+		SocketModel.io.on("promoted", (roomId: string, tokens: TokenModel) =>
+		{
+			console.log(`You have been muted in ${roomId}`);
+			if (SocketModel.onPromoted != null)
+				SocketModel.onPromoted(roomId, tokens);
+		})
+
+		SocketModel.io.on("demoted", (roomId: string) =>
+		{
+			console.log(`You have been demoted in ${roomId}`);
+			if (SocketModel.onDemoted != null)
+				SocketModel.onDemoted(roomId);
+		})
 	}
 
 	public static Authenticate(username: string): Promise<UserModel>
 	{
-		return new Promise<UserModel>((resolve, reject) => {
-			SocketModel.io.emit('authenticate', username, (result: ResultModel<UserModel>) =>{
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
-				else
-					resolve(result.content)
+		globalThis.rooms = SocketModel.rooms = reactive<Record<string, RoomModel>>({});
+		if (SocketModel.onRoomsUpdated != null)
+			SocketModel.onRoomsUpdated(Object.values(SocketModel.rooms))
+		return new Promise<UserModel>((resolve, reject) =>
+		{
+			SocketModel.io.emit("authenticate", username, (result: ResultModel<AuthenticationModel>) =>
+			{
+				if (result.error)
+					return reject(new Error(result.error))
+				for (const room of result.data.rooms)
+					SocketModel.rooms[room.id] = reactive<RoomModel>(RoomModel.fromJson(room));
+				resolve(result.data.user)
 			})
 		})
 	}
 
 	public static GetRooms(): RoomModel[]
 	{
-		return Array.from(SocketModel.rooms.values());
+		return Object.values(SocketModel.rooms);
 	}
 
-	public static CreateRoom(room: RoomModel): Promise<RoomModel>
+	public static GetRoom(roomId: string): RoomModel
 	{
-		return new Promise<RoomModel>((resolve, reject) => {
-			SocketModel.io.emit('create-room', room.name, room.audioOnly, (result: ResultModel<RoomModel>) => {
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
+		return SocketModel.rooms[roomId];
+	}
+
+	public static CreateRoom(room: RoomModel): Promise<string>
+	{
+		return new Promise<string>((resolve, reject) =>
+		{
+			SocketModel.io.emit("create-room", room.name, room.audioOnly, (result: ResultModel<string>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
 				else
-					resolve(result.content)
+					resolve(result.data)
 			})
 		})
 	}
 
-	public static JoinRoom(roomId: string): Promise<JoinModel>
+	public static JoinRoom(roomId: string): Promise<TokenModel>
 	{
-		return new Promise<JoinModel>((resolve, reject) => {
-			SocketModel.io.emit('join-room', roomId, (result: ResultModel<JoinModel>) => {
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
+		return new Promise<TokenModel>((resolve, reject) =>
+		{
+			SocketModel.io.emit("join-room", roomId, (result: ResultModel<TokenModel>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
 				else
-					resolve(result.content)
+					resolve(result.data)
+			})
+		})
+	}
+
+	public static LeaveRoom(roomId: string): Promise<void>
+	{
+		return new Promise<void>((resolve, reject) =>
+		{
+			SocketModel.io.emit("leave-room", roomId, (result: ResultModel<void>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
+				else
+					resolve()
 			})
 		})
 	}
 
 	public static RaiseHand(roomId: string, raised: boolean): Promise<void>
 	{
-		return new Promise<void>((resolve, reject) => {
-			SocketModel.io.emit('raise-hand', roomId, raised, (result: ResultModel<void>) => {
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
+		return new Promise<void>((resolve, reject) =>
+		{
+			SocketModel.io.emit("raise-hand", roomId, raised, (result: ResultModel<void>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
 				else
-					resolve(result.content)
+					resolve(result.data)
 			})
 		})
 	}
 
 	public static Mute(roomId: string, userId: string, muted: boolean): Promise<void>
 	{
-		return new Promise<void>((resolve, reject) => {
-			SocketModel.io.emit('mute', roomId, muted, (result: ResultModel<void>) => {
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
+		return new Promise<void>((resolve, reject) =>
+		{
+			SocketModel.io.emit("mute", roomId, muted, (result: ResultModel<void>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
 				else
-					resolve(result.content)
+					resolve(result.data)
 			})
 		})
 	}
 
 	public static PromoteUser(roomId: string, userId: string, promote: boolean): Promise<void>
 	{
-		return new Promise<void>((resolve, reject) => {
-			SocketModel.io.emit('promote-user', roomId, userId, promote, (result: ResultModel<void>) => {
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
+		return new Promise<void>((resolve, reject) =>
+		{
+			SocketModel.io.emit("promote-user", roomId, userId, promote, (result: ResultModel<void>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
 				else
-					resolve(result.content)
+					resolve(result.data)
 			})
 		})
 	}
 
 	public static KickUser(roomId: string, userId: string): Promise<void>
 	{
-		return new Promise<void>((resolve, reject) => {
-			SocketModel.io.emit('kick-user', roomId, userId, (result: ResultModel<void>) => {
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
+		return new Promise<void>((resolve, reject) =>
+		{
+			SocketModel.io.emit("kick-user", roomId, userId, (result: ResultModel<void>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
 				else
-					resolve(result.content)
+					resolve(result.data)
 			})
 		})
 	}
@@ -212,18 +274,18 @@ export default class SocketModel
 	{
 		return new Promise<void>((resolve, reject) =>
 		{
-			SocketModel.io.emit('mute-speaker', roomId, userId, (result: ResultModel<void>) => {
-				if (result.Error.HasError)
-					reject(new Error(result.Error.Message))
+			SocketModel.io.emit("mute-speaker", roomId, userId, (result: ResultModel<void>) =>
+			{
+				if (result.error)
+					reject(new Error(result.error))
 				else
-					resolve(result.content)
+					resolve(result.data)
 			})
 		})
 	}
 
 	public static onRoomsUpdated: (roomsList: RoomModel[]) => void
-	public static onRoomUpdated: (room: RoomModel) => void
-	public static onUserRaisedHand: (room: RoomModel, participant: ParticipantModel) => void
+	public static onUserRaisedHand: (roomId: string, participant: ParticipantModel) => void
 
 	public static onMuted: (roomId: string) => void
 	public static onPromoted: (roomId: string, tokens: TokenModel) => void

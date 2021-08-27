@@ -45,13 +45,14 @@
         display: flex;
         align-items: center;
         margin-top: 10px;
+        height: 25px;
         position: relative;
         &:before{
             content: '';
             position: absolute;
             right: 0;
-            bottom: 1px;
-            height: 1px;
+            bottom: 4pt;
+            height: 1pt;
             background-color: #BAC4D3;
             width: 100%;
         }
@@ -178,7 +179,7 @@
         border: 2px solid white;
     }
 
-    .raised-hand .circulo {
+    .raised-hand .circulo, .raised-hand button {
         background: #FFA500;
         box-shadow: 0 0 0 0 #FFA500;
         color: white;
