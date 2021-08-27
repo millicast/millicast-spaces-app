@@ -89,9 +89,12 @@ export default class SocketModel
 			//Remove raised hand flag
 			participant.raisedHand = false;
 			if (promoted)
+			{
 				//Add to speakers
 				room.speakers[userId] = true;
-			else
+				//Not muted
+				participant.muted = false;
+			} else
 				//Remove from speakers
 				delete (room.speakers[userId]);
 		})
