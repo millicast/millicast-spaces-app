@@ -28,7 +28,7 @@
 
             <!-- Toasts -->
             <!-- Añadir slideDown para hacer aparecer -->
-            <div v-if="isOwner && lastPendingRequestUser" v-bind:class="{'toast': true, 'success': true, 'slideDown': true}">
+            <div v-if="isOwner && lastPendingRequestUser" class="toast success slideDown">
                 <div class="sup">
                     <div class="icono">
                         <i class="fal fa-hand-paper"></i>
@@ -51,7 +51,7 @@
             </div>
 
             <!-- Añadir slideDown para hacer aparecer -->
-            <div v-bind:class="{'toast': true, 'success': true, 'slideDown': promotedChanged}">
+            <div class="toast success" v-bind:class="{'slideDown': promotedChanged}">
                 <div class="sup">
                     <div class="icono">
                         <i class="fal fa-hand-paper"></i>
@@ -68,7 +68,7 @@
             <!-- Toasts -->
 
             <!-- Modales manuales-->
-            <div v-if="isOwner && selectedUser && selectedUser.id in room.participants" class="modalManual" v-bind:class="{'modalManual': true, 'hidden': !showManageUserWindow}">
+            <div v-if="isOwner && selectedUser && selectedUser.id in room.participants" class="modalManual" v-bind:class="{'hidden': !showManageUserWindow}">
                 <div class="cuerpo">
                     <button class="icoClose" @click="showManageUserWindow = false;"><i class="far fa-times"></i></button>
                     <div class="cabeceraConFoto">
@@ -159,19 +159,21 @@
                 </div>
 
                 <div class="gridUsers">
-                    <div v-if="!room.audioOnly && owner" class="mainVideo">
+                    <div v-if="!room.audioOnly && owner" class="mainVideo" v-bind:class="{'muteado'  : owner.muted}">
                         <div>
                             <div class="foto">
                                 <div class="marco">
                                     <video></video>
                                 </div>
+                                <div class="circulo" v-if="owner.muted">
+                                    <i class="far fa-microphone-alt-slash"></i>
+                                </div>
                             </div>
                             <h4 v-if="owner">{{owner.username}}</h4>
                         </div>
                     </div>
-
                     <div v-for="speaker in audioOnlySpeakers" :key="speaker.id" 
-                        v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==user.id ||  speaker.id==room.ownerId,'hablando' : speaker.audioLevel>0.01,'muteado'  : speaker.muted}"
+                        v-bind:class="{'multiplexed': speaker.multiplexedId!=null || speaker.id==$user.id ||  speaker.id==room.ownerId,'hablando' : speaker.audioLevel>0.01,'muteado'  : speaker.muted}"
                         v-bind:style="{'--audio-level': speaker.audioLevel>0.01 ? speaker.audioLevel : 0}"
                         @click="openUserWindow(speaker);"
                     >

@@ -19,31 +19,12 @@ export default defineComponent({
 	data()
 	{
 		return {
-			user: new UserModel(),
-			rooms: []
+			rooms: null
 		}
 	},
 	methods: {
-		async initRooms()
-		{
-			const rooms = await SocketModel.GetRooms();
-			this.loadRooms(rooms);
-		},
-		loadRooms(rooms: RoomModel[])
-		{
-
-			this.rooms = [];
-
-			for (let room of rooms)
-				this.rooms.push(room);
-		},
-		loaduserData()
-		{
-			this.user.username = this.$user.username;
-		},
 		async openRoomModal()
 		{
-
 			const modal = await modalController.create({
 				component: roomsModal,
 				componentProps: {
@@ -60,14 +41,8 @@ export default defineComponent({
 			this.$router.push({ path: `/roomsform/${roomId}` })
 		},
 	},
-	ionViewDidEnter()
+	mounted()
 	{
-		this.loaduserData();
-		this.initRooms();
-
-		SocketModel.onRoomsUpdated = (rooms: RoomModel[]) =>
-		{
-			this.loadRooms(rooms);
-		};
+		this.rooms = SocketModel.GetRooms();
 	}
 })

@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { modalController } from '@ionic/vue';
 import App from './App.vue'
 import router from './router';
 
@@ -34,9 +35,11 @@ const app = createApp(App)
 app.config.globalProperties.$user = new UserModel();
 SocketModel.initialize()
 
-SocketModel.onDisconnected = () =>
+SocketModel.onDisconnected = async () =>
 {
 	app.config.globalProperties.$user = new UserModel();
+	const modal = await modalController.getTop();
+	if (modal) modal.dismiss();
 	router.push({ path: "/" })
 }
 

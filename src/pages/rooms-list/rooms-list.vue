@@ -27,13 +27,12 @@
             </ion-toolbar>
         </ion-header>
         <ion-content>
-            <div class="estructuraFlex">
+            <div class="estructuraFlex" v-if="rooms">
                 <div class="cabeceraInt">
                     <h1>Rooms</h1>
                 </div>
-                <div class="gridTarjetas" v-if="rooms.length >= 0">
-                    <!--dynamic list -->
-                    <div class="tarjeta" v-for="room in rooms" :key="room.name" @click="goToRoom(room.id);">
+                <div class="gridTarjetas" v-if="rooms.size >= 0">
+                    <div class="tarjeta" v-for="[roomId,room] in rooms" :key="room.name" @click="goToRoom(roomId);">
                         <div class="titulo">
                             <h2>
                                 <i class="fas" v-bind:class="room.audioOnly ? 'fa-microphone' : 'fa-video'"></i>
@@ -76,14 +75,12 @@
                             </div>
                         </div>
                     </div>
-                    <!--fin dynamic list -->
                 </div>
-                <!-- Cuando no hay salas -->
-                <div class="central" v-if="rooms.length == 0">
+                <div class="central" v-if="rooms.size == 0">
                     <div class="icono">
                         <img src="/assets/images/ico-podcast.svg" alt="podcast" />
                     </div>
-                    <h2>Hi {{user.username}}!</h2>
+                    <h2>Hi {{$user.username}}!</h2>
                     <p>It seems that there are no open rooms</p>
                     <p>
                         <button class="botonLink" @click="openRoomModal()">Create a new room here<i class="fas fa-arrow-right"></i></button>

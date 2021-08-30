@@ -1,14 +1,19 @@
 <template>
     <ion-page id="pgLogin">
-        <!--<ion-header>
-            <ion-toolbar>
-                <ion-title>
-                    Login
-                </ion-title>
-            </ion-toolbar>
-        </ion-header>-->
         <ion-content>
-
+            <div class="toast error" v-bind:class="{'slideDown': authenticationFailed}">
+                <div class="sup">
+                    <div class="icono">
+                        <i class="fal fa-hand-paper"></i>
+                    </div>
+                    <div>
+                      <p>{{errorMessage}}</p>
+                    </div>
+                    <div class="close" @click="hideAauthenticationFailed();">
+                        <i class="fal fa-times"></i>
+                    </div>
+                </div>
+            </div>
             <div class="estructuraLogin">
                 <div class="animaciones">
                     <div class="shape shape-five">
@@ -39,7 +44,7 @@
                                     <i class="fas fa-user"></i>
                                 </div>
                             </div>
-                            <input type="text" class="form-control form-control-lg" placeholder="@Nickname" @input="user.username=$event.target.value" />
+                            <input type="text" class="form-control form-control-lg" placeholder="username" @input="user.username=$event.target.value" />
                         </div>
                         
                     </div>
@@ -60,11 +65,6 @@
             </div>
             
         </ion-content>
-        <!--<ion-footer>
-            <ion-button expand="full" @click="doLogin()">
-                <ion-label>Login</ion-label>
-            </ion-button>
-        </ion-footer>-->
     </ion-page>
 </template>
 <script src="./login.ts" lang="ts"></script>

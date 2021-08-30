@@ -24,7 +24,6 @@ export default defineComponent({
 	data()
 	{
 		return {
-			user: new UserModel(),
 			room: null,
 			viewer: null,
 			publisher: null,
@@ -78,11 +77,11 @@ export default defineComponent({
 		},
 		us: function ()
 		{
-			return this.room.participants[this.user.id];
+			return this.room.participants[this.$user.id];
 		},
 		isOwner: function ()
 		{
-			return this.room.ownerId == this.user.id;
+			return this.room.ownerId == this.$user.id;
 		},
 		raisedHands: function ()
 		{
@@ -94,53 +93,30 @@ export default defineComponent({
 		async init()
 		{
 			const route = useRoute();
-
+			//Get room id from route
 			const roomId = route.params["roomId"].toString();
+			//Get room
+			this.room = SocketModel.GetRoom(roomId);
 			//The list of multiplexed audios
 			this.multiplexed = {};
-			//Read current user from global state
-			const user = this.$user;
-			//Get room
-			const room = SocketModel.GetRoom(roomId);
-			//Load data
-			await Promise.all([
-				this.loadRoomUser(user),
-				this.loadRoom(room),
-				this.assignSockets(),
-			]);
-
-			const cntViewerTags = document.getElementById("cntViewerTags")
-			while (cntViewerTags && cntViewerTags.firstChild)
-				cntViewerTags.removeChild(cntViewerTags.firstChild);
-
-			//Join room and retrieve publisher and viewer stats
-			const tokens = await SocketModel.JoinRoom(roomId);
-
-			await Promise.all([
-				this.preparePublisher(user, tokens, room),
-				this.prepareViewer(user, tokens, room)
-			]);
-		},
-		async close()
-		{
-			//Clean media elements
-			for (const element of document.querySelectorAll<HTMLMediaElement>("audio,video"))
-				element.srcObject = null;
-			if (this.room.id) SocketModel.LeaveRoom(this.room.id);
-			await Promise.all([
-				this.stopViewer(),
-				this.stopPublisher(),
-
-			]);
-
-		},
-		async assignSockets()
-		{
-
+			//Restore multiplexing data
+			for (let [mediaId, sourceId] of Object.entries(this.multiplexed))
+			{
+				//Find speaker
+				const speaker = this.room.participants[sourceId as string];
+				//If got it
+				if (speaker)
+				{
+					//Assing multiplexing id
+					speaker.multiplexedId = mediaId;
+					speaker.audioLevel = 0;
+				}
+			}
+			//Set socket events
 			SocketModel.onPromoted = async (roomId: string, tokens: TokenModel) =>
 			{
 				//Start publishing
-				this.preparePublisher(this.user, tokens, this.room);
+				this.preparePublisher(tokens);
 				//Show modal
 				this.showPromoted();
 			};
@@ -168,6 +144,30 @@ export default defineComponent({
 			{
 				this.openMsgWindow(participant);
 			};
+
+			const cntViewerTags = document.getElementById("cntViewerTags")
+			while (cntViewerTags && cntViewerTags.firstChild)
+				cntViewerTags.removeChild(cntViewerTags.firstChild);
+
+			//Join room and retrieve publisher and viewer stats
+			const tokens = await SocketModel.JoinRoom(roomId);
+
+			await Promise.all([
+				this.preparePublisher(tokens),
+				this.prepareViewer(tokens)
+			]);
+		},
+		async close()
+		{
+			//Clean media elements
+			for (const element of document.querySelectorAll<HTMLMediaElement>("audio,video"))
+				element.srcObject = null;
+			if (this.room.id) SocketModel.LeaveRoom(this.room.id);
+			await Promise.all([
+				this.stopViewer(),
+				this.stopPublisher(),
+
+			]);
 
 		},
 		async stopViewer()
@@ -203,17 +203,21 @@ export default defineComponent({
 			//Stop stats interval
 			clearInterval(this.publishingStats);
 		},
-		async preparePublisher(usr: UserModel, tokens: TokenModel, room: RoomModel)
+		async preparePublisher(tokens: TokenModel)
 		{
 
-			//Get user id
-			const sourceId = usr.id;
+			//Get ids
+			const sourceId = this.$user.id;
+			const streamId = this.room.id;
+			//PUblishing as audio only?
+			const disableVideo = this.room.audioOnly || this.room.ownerId != this.$user.id;
 
 			if (tokens.publisherToken != null && this.publisher == null)
 			{
-				this.publisher = new Publish(room.id, () => { return tokens.publisherToken });
+				//Prepare publish object
+				this.publisher = new Publish(streamId, () => { return tokens.publisherToken });
 				//We only capture video on video rooms and for the owner
-				this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !room.audioOnly && room.ownerId == sourceId });
+				this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !disableVideo });
 				//Not muted
 				this.muted = false;
 				//Show local video
@@ -234,10 +238,11 @@ export default defineComponent({
 					});
 				}
 				this.publishing = true;
+				//Start publishing
 				await this.publisher.connect({
 					mediaStream: this.mediaStream,
 					sourceId: sourceId,
-					disableVideo: room.audioOnly,
+					disableVideo,
 					dtx: true,
 					peerConfig: {
 						iceServers: []
@@ -255,7 +260,7 @@ export default defineComponent({
 						if (stat.kind == "audio" && stat.type == "media-source")
 						{
 							//Find us
-							const us = this.room.participants[this.user.id];
+							const us = this.room.participants[this.$user.id];
 							//Set our audio level
 							us.audioLevel = stat.audioLevel;
 							//Done
@@ -265,13 +270,18 @@ export default defineComponent({
 				}, 100);
 			}
 		},
-		async prepareViewer(usr: UserModel, tokens: TokenModel, room: RoomModel)
+		async prepareViewer(tokens: TokenModel)
 		{
-
-			let sourceId = usr.id;
-
-			this.viewer = new View(room.id, () => { return tokens.viewerToken });
-
+			//Get ids
+			const sourceId = this.$user.id;
+			const streamId = this.room.id;
+			//Receiving audio only?
+			const disableVideo = this.room.audioOnly || this.room.ownerId == this.$user.id;
+			//Recive always the owner source except if it is us
+			const pinnedSourceId = this.room.ownerId != this.$user.id ? this.room.ownerId : null;
+			//Prepare viewer
+			this.viewer = new View(streamId, () => { return tokens.viewerToken });
+			//Handle on incoming remote track event
 			this.viewer.on("track", (event) =>
 			{
 				//Get track and transceiver from event
@@ -331,7 +341,7 @@ export default defineComponent({
 					document.getElementById("cntViewerTags").appendChild(element);
 				}
 			});
-
+			//Handle broadcasting events from stream
 			this.viewer.on("broadcastEvent", (event) =>
 			{
 				//Get event name and data
@@ -339,14 +349,17 @@ export default defineComponent({
 
 				switch (name)
 				{
+					//A source has been activated in the stream
 					case "active":
-						//console.log(`active source ${data.sourceId}`);
+						console.debug(`active source ${data.sourceId}`);
 						break;
+					//A source has been deactivated in the stream
 					case "inactive":
-						//console.log(`inactive source ${data.sourceId}`);
+						console.debug(`inactive source ${data.sourceId}`);
 						break;
+					//One of the multiplexing audio tracks has changed the source based on the voice activity
 					case "vad":
-						console.log(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
+						console.debug(data.sourceId ? `mid ${data.mediaId} multiplexing source ${data.sourceId}` : `mid ${data.mediaId} not multiplexing any source`);
 						//Find old speaker
 						const oldSpeaker = this.room.participants[this.multiplexed[data.mediaId]];
 						//If there was a previous speaker in that multiplexed id
@@ -367,16 +380,16 @@ export default defineComponent({
 							speaker.multiplexedId = data.mediaId;
 							speaker.audioLevel = 0;
 						}
-						console.log("old: " + (oldSpeaker ? oldSpeaker.user : "none") + "new: " + (speaker ? speaker.user : "none"));
+						console.debug("old: " + (oldSpeaker ? oldSpeaker.user : "none") + "new: " + (speaker ? speaker.user : "none"));
 
 				}
 			});
-
+			//Start streaming
 			await this.viewer.connect({
-				pinnedSourceId: room.ownerId != sourceId ? room.ownerId : null,
+				pinnedSourceId,
 				multiplexedAudioTracks: 3,
 				excludedSourceIds: [sourceId],
-				disableVideo: room.audioOnly || room.ownerId == sourceId,
+				disableVideo,
 				dtx: true,
 				peerConfig: {
 					iceServers: []
@@ -388,7 +401,7 @@ export default defineComponent({
 			this.viewingStats = setInterval(async () =>
 			{
 				//IF we are not the owners
-				if (this.user.id != this.room.ownerId)
+				if (this.$user.id != this.room.ownerId)
 				{
 					//Get first audio transceiver
 					const mainAudio = pc.getTransceivers().filter(t => t.receiver.track.kind == "audio")[0];
@@ -440,29 +453,6 @@ export default defineComponent({
 			}, 100);
 
 		},
-		loadRoom(room: RoomModel)
-		{
-			console.log("loadRoom");
-			//Update room data
-			this.room = room;
-			//Restore multiplexing data
-			for (let [mediaId, sourceId] of Object.entries(this.multiplexed))
-			{
-				//Find speaker
-				const speaker = this.room.participants[sourceId as string];
-				//If got it
-				if (speaker)
-				{
-					//Assing multiplexing id
-					speaker.multiplexedId = mediaId;
-					speaker.audioLevel = 0;
-				}
-			}
-		},
-		loadRoomUser(usr: UserModel)
-		{
-			this.user = usr;
-		},
 		async raiseHand(raised: boolean)
 		{
 			await SocketModel.RaiseHand(this.room.id, raised)
@@ -494,11 +484,11 @@ export default defineComponent({
 			const audioTrack = this.mediaStream.getAudioTracks()[0];
 			audioTrack.enabled = !audioTrack.enabled;
 			this.muted = !audioTrack.enabled;
-			await SocketModel.Mute(this.room.id, this.user.id, this.muted);
+			await SocketModel.Mute(this.room.id, this.$user.id, this.muted);
 		},
 		openUserWindow(selectedUser: ParticipantModel)
 		{
-			if (this.user.id == this.room.ownerId && selectedUser.id != this.room.ownerId)
+			if (this.$user.id == this.room.ownerId && selectedUser.id != this.room.ownerId)
 			{
 				this.selectedUser = selectedUser;
 				this.showManageUserWindow = true;
@@ -506,7 +496,7 @@ export default defineComponent({
 		},
 		openMsgWindow(participant: ParticipantModel)
 		{
-			if (this.room.ownerId != this.user.id)
+			if (this.room.ownerId != this.$user.id)
 				return;
 
 			if (participant.raisedHand && !this.lastPendingRequestUser)

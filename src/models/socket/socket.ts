@@ -18,49 +18,48 @@ class AuthenticationModel
 	rooms: RoomModel[]
 }
 
+//Privat room map
+const rooms: Map<string, RoomModel> = reactive<Map<string, RoomModel>>(new Map<string, RoomModel>());
 
 export default class SocketModel
 {
 	private static io: Socket<DefaultEventsMap, DefaultEventsMap>
-	private static rooms: Record<string, RoomModel>;
 	public static initialize(): void
 	{
-		SocketModel.io = io(ConfigModel.ServerURL, ConfigModel.ServerOptions)
-		SocketModel.io.connect()
+		//Clear rooms
+		rooms.clear();
 
+		SocketModel.io = io(ConfigModel.ServerURL, ConfigModel.ServerOptions);
+		SocketModel.io.connect();
 
 		SocketModel.io.on("room-created", (room: any) =>
 		{
 			console.log(`Room created ${room.id}`);
 			//Add room to list
-			globalThis.room = SocketModel.rooms[room.id] = reactive<RoomModel>(RoomModel.fromJson(room));
-			if (SocketModel.onRoomsUpdated != null)
-				SocketModel.onRoomsUpdated(Object.values(SocketModel.rooms))
+			rooms.set(room.id, reactive<RoomModel>(RoomModel.fromJson(room)));
 		})
 
 		SocketModel.io.on("room-deleted", (roomId: string) =>
 		{
 			console.log(`Room deleted ${roomId}`);
 			//Delete from from list
-			delete (SocketModel.rooms[roomId]);
-			if (SocketModel.onRoomsUpdated != null)
-				SocketModel.onRoomsUpdated(Object.values(SocketModel.rooms))
+			rooms.delete(roomId);
 		})
 
 		SocketModel.io.on("user-joined", (roomId: string, participant: ParticipantModel) =>
 		{
 			console.log(`User ${participant.id}  ${participant.username} joined ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms[roomId];
+			const room = rooms.get(roomId);
 			//Add participantd
-			globalThis.participant = room.participants[participant.id] = reactive<ParticipantModel>(participant);
+			room.participants[participant.id] = reactive<ParticipantModel>(participant);
 		})
 
 		SocketModel.io.on("user-left", (roomId: string, userId: string) =>
 		{
 			console.log(`User ${userId} left ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms[roomId];
+			const room = rooms.get(roomId);
 			//Remove participant
 			delete (room.speakers[userId]);
 			delete (room.participants[userId]);
@@ -68,8 +67,9 @@ export default class SocketModel
 
 		SocketModel.io.on("user-raised-hand", (roomId: string, userId: string, raised: boolean) =>
 		{
+			console.log(`User ${userId} raised hand in ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms[roomId];
+			const room = rooms.get(roomId);
 			//Get participant
 			const participant = room.participants[userId];
 			//Update raised hand flag
@@ -83,7 +83,7 @@ export default class SocketModel
 		{
 			console.log(`User ${userId} promoted:${promoted} in ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms[roomId];
+			const room = rooms.get(roomId);
 			//Get participant
 			const participant = room.participants[userId];
 			//Remove raised hand flag
@@ -101,19 +101,20 @@ export default class SocketModel
 
 		SocketModel.io.on("user-muted", (roomId: string, userId: string, muted: boolean) =>
 		{
+			console.log(`User ${userId} muted in ${roomId}`);
 			//Get room
-			const room = SocketModel.rooms[roomId];
+			const room = rooms.get(roomId);
 			//Get participant
 			const participant = room.participants[userId];
 			//Update muted flag
 			participant.muted = muted;
-
 		})
-
 
 		SocketModel.io.on("disconnect", function ()
 		{
-			console.log("disconnected");
+			console.log("You have disconnected from server");
+			//Clear rooms
+			rooms.clear();
 			if (SocketModel.onDisconnected != null)
 				SocketModel.onDisconnected();
 		});
@@ -134,7 +135,7 @@ export default class SocketModel
 
 		SocketModel.io.on("promoted", (roomId: string, tokens: TokenModel) =>
 		{
-			console.log(`You have been muted in ${roomId}`);
+			console.log(`You have been promoted in ${roomId}`);
 			if (SocketModel.onPromoted != null)
 				SocketModel.onPromoted(roomId, tokens);
 		})
@@ -149,30 +150,28 @@ export default class SocketModel
 
 	public static Authenticate(username: string): Promise<UserModel>
 	{
-		globalThis.rooms = SocketModel.rooms = reactive<Record<string, RoomModel>>({});
-		if (SocketModel.onRoomsUpdated != null)
-			SocketModel.onRoomsUpdated(Object.values(SocketModel.rooms))
 		return new Promise<UserModel>((resolve, reject) =>
 		{
 			SocketModel.io.emit("authenticate", username, (result: ResultModel<AuthenticationModel>) =>
 			{
 				if (result.error)
 					return reject(new Error(result.error))
+				rooms.clear();
 				for (const room of result.data.rooms)
-					SocketModel.rooms[room.id] = reactive<RoomModel>(RoomModel.fromJson(room));
+					rooms.set(room.id,RoomModel.fromJson(room));
 				resolve(result.data.user)
 			})
 		})
 	}
 
-	public static GetRooms(): RoomModel[]
+	public static GetRooms(): Map<string,RoomModel>
 	{
-		return Object.values(SocketModel.rooms);
+		return rooms;
 	}
 
 	public static GetRoom(roomId: string): RoomModel
 	{
-		return SocketModel.rooms[roomId];
+		return rooms.get(roomId);
 	}
 
 	public static CreateRoom(room: RoomModel): Promise<string>
@@ -287,7 +286,6 @@ export default class SocketModel
 		})
 	}
 
-	public static onRoomsUpdated: (roomsList: RoomModel[]) => void
 	public static onUserRaisedHand: (roomId: string, participant: ParticipantModel) => void
 
 	public static onMuted: (roomId: string) => void
@@ -296,3 +294,5 @@ export default class SocketModel
 	public static onKicked: (roomId: string) => void
 	public static onDisconnected: () => void
 }
+
+
