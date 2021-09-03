@@ -1,6 +1,7 @@
 {
   "name": "millicast-spaces-app",
   "version": "1.0.0",
+  "description": "Demo application for Millicast multisource APIs",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -21,6 +22,7 @@
     "@ionic/vue-router": "^5.4.0",
     "@millicast/sdk": "^0.1.7",
     "core-js": "^3.6.5",
+    "register-service-worker": "^1.7.1",
     "sass": "^1.35.2",
     "sass-loader": "^10.1.1",
     "socket.io-client": "^4.1.2",
@@ -35,6 +37,7 @@
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-e2e-cypress": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-pwa": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
     "@vue/cli-plugin-unit-jest": "~4.5.0",
@@ -47,6 +50,5 @@
     "typescript": "~3.9.3",
     "vue-jest": "^5.0.0-0",
     "vue-loader-v16": "^16.0.0-beta.5.4"
-  },
-  "description": "Demo application for Millicast multisource APIs"
+  }
 }

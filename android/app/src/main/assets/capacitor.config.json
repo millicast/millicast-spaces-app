@@ -1,5 +1,5 @@
 {
-	"appId": "io.ionic.starter",
+	"appId": "app.spaces.millicast",
 	"appName": "Millicast App",
 	"webDir": "dist",
 	"bundledWebRuntime": false
