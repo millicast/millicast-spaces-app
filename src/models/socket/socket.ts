@@ -1,5 +1,4 @@
 import { io, Socket } from "socket.io-client"
-import { DefaultEventsMap } from "socket.io-client/build/typed-events"
 import UserModel from "../rooms/UserModel";
 import ParticipantModel from "../rooms/ParticipantModel";
 import RoomModel from "../rooms/RoomModel";
@@ -23,7 +22,7 @@ const rooms: Map<string, RoomModel> = reactive<Map<string, RoomModel>>(new Map<s
 
 export default class SocketModel
 {
-	private static io: Socket<DefaultEventsMap, DefaultEventsMap>
+	private static io: Socket
 	public static initialize(): void
 	{
 		//Clear rooms
