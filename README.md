@@ -1,6 +1,6 @@
 # Install dependencies
 
-`npm i`
+`npm ci`
 
 
 # Debug
@@ -10,7 +10,4 @@
 
 # Production
 
-`yarn run build`
-
-Requires yarn which you can install with 
-`npm i -g yarn`
+`npm run build`
