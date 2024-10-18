@@ -13,8 +13,6 @@ import SocketModel from '../../models/socket/socket';
 import requestsModal from '../requests-modal/requests-modal.vue';
 import { Director, Publish, View, Logger } from '@millicast/sdk'
 
-Logger.setLevel(Logger.DEBUG);
-
 export default defineComponent({
 	name: 'RoomsForm',
 	components: {
